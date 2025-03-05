@@ -1,0 +1,87 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Create Visual Forms table
+        Schema::create(Config::get('visual-forms.tables.visual_forms'), function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        // Create Visual Form Fields table
+        Schema::create(Config::get('visual-forms.tables.visual_form_fields'), function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
+            $table->string('name');
+            $table->ulid()->unique();
+            $table->string('control_type')->default(\Coolsam\VisualForms\ControlTypes::TextInput->name);
+            $table->string('label')->nullable();
+            $table->string('placeholder')->nullable();
+
+            // Common characteristics
+            $table->boolean('required')->default(false);
+            $table->boolean('disabled')->default(false);
+            $table->boolean('readonly')->default(false);
+            $table->boolean('multiple')->default(false);
+            $table->boolean('inline_label')->default(false);
+            $table->boolean('inline')->default(false);
+            $table->boolean('hidden_label')->default(false);
+            $table->boolean('autofocus')->default(false);
+            $table->boolean('autocapitalize')->default(false);
+            $table->boolean('autocomplete')->default(false);
+            $table->integer('max_length')->nullable();
+            $table->integer('min_length')->nullable();
+            $table->integer('max')->nullable();
+            $table->integer('min')->nullable();
+            $table->integer('step')->nullable();
+            $table->string('pattern')->nullable();
+            $table->string('mask')->nullable();
+
+            // For file upload
+            $table->integer('max_file_size')->nullable();
+            $table->integer('max_files')->nullable();
+            $table->json('accepted_file_types')->nullable();
+
+
+            $table->string('type')->default('text');
+            $table->enum('live_status', ['off', 'on', 'onBlur', 'debounced'])->default('off');
+            $table->integer('debounce_time')->default(300);
+            $table->json('validation_rules')->nullable();
+            $table->json('options')->nullable();
+            $table->string('default_value')->nullable();
+
+            // other attributes
+            $table->json('extra_props')->nullable();
+            $table->json('extra_attributes')->nullable();
+            $table->timestamps();
+        });
+
+        // Create Visual Form Entries table
+        Schema::create(Config::get('visual-forms.tables.visual_form_entries'), function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
+            $table->json('payload');
+            $table->boolean('is_processed')->default(false);
+            $table->string('ip_address')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists(Config::get('visual-forms.tables.visual_forms'));
+        Schema::dropIfExists(Config::get('visual-forms.tables.visual_form_fields'));
+        Schema::dropIfExists(Config::get('visual-forms.tables.visual_form_entries'));
+    }
+};

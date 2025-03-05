@@ -1,20 +1,23 @@
 <?php
 
-namespace VendorName\Skeleton;
+namespace Coolsam\VisualForms;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class SkeletonPlugin implements Plugin
+class VisualFormsPlugin implements Plugin
 {
     public function getId(): string
     {
-        return 'skeleton';
+        return 'visual-forms';
     }
 
     public function register(Panel $panel): void
     {
-        //
+        $panel
+            ->discoverResources(in: __DIR__ . '/Filament/Resources', for: 'Coolsam\\VisualForms\\Filament\\Resources')
+            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages')
+        ;
     }
 
     public function boot(Panel $panel): void
