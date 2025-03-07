@@ -19,6 +19,7 @@ class VisualFormField extends Model
         'required' => 'boolean',
         'options_from_db' => 'boolean',
         'options_where_conditions' => 'array',
+        'options' => 'array',
     ];
 
     public function uniqueIds(): array
