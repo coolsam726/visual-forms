@@ -5,7 +5,7 @@ return [
     'tables' => [
         'visual_forms' => env('VISUAL_FORMS_TABLE', 'visual_forms'),
         'visual_form_fields' => env('VISUAL_FORM_FIELDS_TABLE', 'visual_form_fields'),
-        'visual_form_entries' => env('VISUAL_FORM_ENTRIES_TABLE', 'visual_form_submissions'),
+        'visual_form_entries' => env('VISUAL_FORM_ENTRIES_TABLE', 'visual_form_entries'),
     ],
     'models' => [
         'visual_form' => env('VISUAL_FORM_MODEL', \Coolsam\VisualForms\Models\VisualForm::class),

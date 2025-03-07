@@ -16,9 +16,8 @@ class VisualForm extends Model
         return $this->hasMany(\Config::get('visual-forms.models.visual_form_field'), 'form_id');
     }
 
-    #[Pure]
     public function schema()
     {
-        return VisualForms::makeSchema($this);
+        return VisualForms::schema($this);
     }
 }

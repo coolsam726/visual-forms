@@ -17,7 +17,14 @@ class VisualFormField extends Model
         'extra_attributes' => 'array',
         'extra_props' => 'array',
         'required' => 'boolean',
+        'options_from_db' => 'boolean',
+        'options_where_conditions' => 'array',
     ];
+
+    public function uniqueIds(): array
+    {
+        return ['ulid'];
+    }
 
     public function parent(): BelongsTo
     {

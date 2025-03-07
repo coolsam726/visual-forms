@@ -60,6 +60,20 @@ return new class extends Migration
             $table->json('validation_rules')->nullable();
             $table->json('options')->nullable();
             $table->string('default_value')->nullable();
+            $table->string('prefix_icon')->nullable();
+            $table->string('suffix_icon')->nullable();
+            $table->boolean('inline_prefix')->default(false);
+            $table->boolean('inline_suffix')->default(false);
+            $table->string('helper_text')->nullable();
+            $table->string('hint')->nullable();
+
+            $table->boolean('options_from_db')->default(false);
+            $table->string('options_db_table')->nullable();
+            $table->string('options_key_attribute')->nullable();
+            $table->string('options_value_attribute')->nullable();
+            $table->json('options_where_conditions')->nullable();
+            $table->json('options_order_by')->nullable();
+            $table->enum('options_order_direction', ['asc', 'desc'])->default('asc');
 
             // other attributes
             $table->json('extra_props')->nullable();
