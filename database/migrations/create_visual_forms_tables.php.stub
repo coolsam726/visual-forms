@@ -31,6 +31,7 @@ return new class extends Migration
 
             // Common characteristics
             $table->boolean('required')->default(false);
+            $table->boolean('unique')->default(false);
             $table->boolean('disabled')->default(false);
             $table->boolean('readonly')->default(false);
             $table->boolean('multiple')->default(false);
@@ -40,6 +41,11 @@ return new class extends Migration
             $table->boolean('autofocus')->default(false);
             $table->boolean('autocapitalize')->default(false);
             $table->boolean('autocomplete')->default(false);
+            $table->boolean('searchable')->default(false);
+            $table->boolean('colspan_full')->default(false);
+
+            $table->integer('rows')->default(5);
+            $table->integer('colspan')->default(1);
             $table->integer('max_length')->nullable();
             $table->integer('min_length')->nullable();
             $table->integer('max')->nullable();
@@ -78,16 +84,19 @@ return new class extends Migration
             // other attributes
             $table->json('extra_props')->nullable();
             $table->json('extra_attributes')->nullable();
+            $table->bigInteger('sort_order')->default(0);
             $table->timestamps();
         });
 
         // Create Visual Form Entries table
         Schema::create(Config::get('visual-forms.tables.visual_form_entries'), function (Blueprint $table) {
             $table->id();
+            $table->ulid()->unique();
             $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
             $table->json('payload');
             $table->boolean('is_processed')->default(false);
             $table->string('ip_address')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

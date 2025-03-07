@@ -60,11 +60,12 @@ class FieldsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('placeholder'),
                 Forms\Components\Fieldset::make('Flags')->schema([
                     Forms\Components\Checkbox::make('required')->default(true),
+                    Forms\Components\Checkbox::make('unique')->default(false),
                     Forms\Components\Checkbox::make('disabled')->default(false),
                     Forms\Components\Checkbox::make('readonly')->default(false),
                     Forms\Components\Checkbox::make('autofocus')->default(false),
                     Forms\Components\Checkbox::make('multiple')->default(false),
-                    Forms\Components\Checkbox::make('autocomplete')->default(true),
+                    Forms\Components\Checkbox::make('autocomplete')->default(false),
                     Forms\Components\Checkbox::make('autocapitalize')->default(false),
                 ]),
                 Forms\Components\Fieldset::make('Field Options')->visible(fn (
@@ -74,9 +75,9 @@ class FieldsRelationManager extends RelationManager
                         Forms\Components\ToggleButtons::make('options_from_db')
                             ->label(__('Options Source'))
                             ->inline()->options([
-                            true => 'From Database',
-                            false => 'Specify Manually',
-                        ])->live()->default(true),
+                                true => 'From Database',
+                                false => 'Specify Manually',
+                            ])->live()->default(true),
                         TableRepeater::make('options')
                             ->visible(fn (Forms\Get $get) => ! $get('options_from_db'))
                             ->columnSpanFull()
@@ -93,7 +94,7 @@ class FieldsRelationManager extends RelationManager
                             ->required(fn (Forms\Get $get) => $get('options_from_db'))
                             ->visible(fn (Forms\Get $get) => $get('options_from_db'))
                             ->searchable()
-                            ->options(fn(Forms\Get $get) => VisualForms::getDatabaseTables())
+                            ->options(fn (Forms\Get $get) => VisualForms::getDatabaseTables())
                             ->live(),
                         Forms\Components\Select::make('options_key_attribute')
                             ->required(fn (Forms\Get $get) => $get('options_from_db') && $get('options_db_table'))
@@ -112,6 +113,7 @@ class FieldsRelationManager extends RelationManager
                             ) => VisualForms::getDatabaseColumns($get('options_db_table'))),
                         TableRepeater::make('options_where_conditions')
                             ->columnSpanFull()
+                            ->defaultItems(0)
                             ->visible(fn (Forms\Get $get) => $get('options_from_db') && $get('options_db_table'))
                             ->headers([
                                 Header::make('column'),
@@ -125,15 +127,29 @@ class FieldsRelationManager extends RelationManager
                                     ) => VisualForms::getDatabaseColumns($get('../../options_db_table'))),
                                 Forms\Components\Select::make('operator')
                                     ->searchable()
-                                    ->options(fn() => VisualForms::getDbOperators()),
+                                    ->options(fn () => VisualForms::getDbOperators()),
                                 Forms\Components\TextInput::make('value'),
                             ]),
 
+                        Forms\Components\Checkbox::make('searchable')->default(true),
                     ]),
-                Forms\Components\Fieldset::make('Validation Rules')->schema([
+                Forms\Components\Fieldset::make(__('Column Control'))->columnSpanFull()->schema(
+                    [
+                        Forms\Components\Checkbox::make('colspan_full')->label(__('Full Width'))->live()->default(false),
+                        Forms\Components\TextInput::make('colspan')
+                            ->numeric()
+                            ->label(__('Column Span'))
+                            ->inlineLabel()
+                            ->required(fn (Forms\Get $get) => ! $get('colspan_full'))
+                            ->visible(fn (Forms\Get $get) => ! $get('colspan_full'))
+                            ->default(1),
+                    ]
+                ),
+                Forms\Components\Fieldset::make(__('Validation Rules'))->schema([
                     TableRepeater::make('validation_rules')
                         ->columnSpanFull()
                         ->hiddenLabel()
+                        ->defaultItems(0)
                         ->headers([
                             Header::make('rule'),
                             Header::make('value'),
@@ -172,11 +188,15 @@ class FieldsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('label')
+            ->modifyQueryUsing(function ($query) {
+                $query->orderBy('sort_order');
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('label'),
                 Tables\Columns\TextColumn::make('type'),
                 Tables\Columns\TextColumn::make('control_type'),
             ])
+            ->reorderable('sort_order')
             ->filters([
                 //
             ])

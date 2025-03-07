@@ -8,6 +8,8 @@ use Coolsam\VisualForms\Models\VisualFormField;
 use Filament\Forms\Components;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\HtmlString;
+use Illuminate\Validation\Rule;
 
 class VisualForms
 {
@@ -119,9 +121,21 @@ class VisualForms
             'uuid',
         ])->mapWithKeys(fn ($rule) => [$rule => str($rule)->camel()->snake()->title()->explode('_')->join(' ')]);
     }
+
     public function schema(VisualForm $form): array
     {
-        return $form->fields->map(fn (VisualFormField $field) => $this->makeField($field))->toArray();
+        // if the form is not active, render a placeholder to show that error
+        if (! $form->is_active) {
+            return [
+                Components\Placeholder::make('form_inactive')
+                    ->label(new HtmlString("<h3 class='!text-danger-500'>Form Inactive</h3>"))
+                    ->content(new HtmlString("<p class='text-danger'>This form is currently inactive. Please activate the form to view the fields.</p>")),
+            ];
+        }
+
+        return $form->fields()->orderBy('sort_order')->get()->map(fn (
+            VisualFormField $field
+        ) => $this->makeField($field))->toArray();
     }
 
     public function makeField(VisualFormField $field)
@@ -149,11 +163,15 @@ class VisualForms
             ControlTypes::ColorPicker->value => Components\ColorPicker::make($field->name),
             ControlTypes::ToggleButtons->value => Components\ToggleButtons::make($field->name),
             ControlTypes::TableRepeater->value => TableRepeater::make($field->name),
+            ControlTypes::Hidden->value => Components\Hidden::make($field->name),
         };
         $control->required($field->required)->label($field->label)
             ->disabled($field->disabled)
             ->helperText($field->helper_text);
 
+        if ($field->default_value != null) {
+            $control->default($field->default_value);
+        }
         if (ControlTypes::hasAutocomplete($field->control_type)) {
             $control->autocomplete($field->autocomplete);
         }
@@ -164,7 +182,27 @@ class VisualForms
 
         if (ControlTypes::hasOptions($field->control_type)) {
             $options = $this->makeOptions($field);
-            $control->options($options)->searchable();
+            $control->options($options);
+        }
+
+        if ($field->colspan_full) {
+            $control->columnSpanFull();
+        } elseif ($field->colspan > 1) {
+            $control->columnSpan($field->colspan);
+        }
+
+        // Handle unique
+        if ($field->unique) {
+            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $field->name);
+            if ($field->id) {
+                $rule = $rule->ignore($field->id);
+            }
+            $control->rule($rule);
+            //            $control->unique($field->unique, str(\Config::get('visual-forms.tables.visual_form_entries'))->append(',payload->')->append($field->name)->toString());
+        }
+
+        if (ControlTypes::hasSearchable($field->control_type)) {
+            $control->searchable($field->searchable);
         }
 
         if (ControlTypes::hasPlaceholder($field->control_type)) {
@@ -198,12 +236,14 @@ class VisualForms
 
     public function makeRules(VisualFormField $field): array
     {
-        if (!($field->validation_rules && count($field->validation_rules))) {
+        if (! ($field->validation_rules && count($field->validation_rules))) {
             return [];
         }
         $rules = collect($field->validation_rules);
 
-        return $rules->mapWithKeys(fn ($rule) => [$rule['rule'] => $rule['rule'] ? "{$rule['rule']}:{$rule['value']}" : $rule['value']])->values()->toArray();
+        return $rules->mapWithKeys(fn (
+            $rule
+        ) => [$rule['rule'] => $rule['rule'] ? "{$rule['rule']}:{$rule['value']}" : $rule['value']])->values()->toArray();
     }
 
     public function makeOptions(VisualFormField $field): Collection | array | null
@@ -306,5 +346,14 @@ class VisualForms
             'in' => 'In (IN)',
             'between' => 'Between (BETWEEN)',
         ];
+    }
+
+    public function recordSubmission(VisualForm $record, array $data, bool $isProcessed = false)
+    {
+        return $record->entries()->create([
+            'payload' => $data,
+            'ip_address' => request()->getClientIp(),
+            'is_processed' => $isProcessed,
+        ]);
     }
 }

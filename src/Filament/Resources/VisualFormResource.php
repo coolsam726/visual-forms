@@ -38,12 +38,12 @@ class VisualFormResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state))),
 
                 TextInput::make('slug')
                     ->readOnly()
                     ->required()
-                    ->unique(VisualForm::class, 'slug', fn ($record) => $record),
+                    ->unique(VisualForm::class, 'slug', fn($record) => $record),
 
                 TextInput::make('description'),
 
@@ -51,11 +51,11 @@ class VisualFormResource extends Resource
 
                 Placeholder::make('created_at')
                     ->label('Created Date')
-                    ->content(fn (?VisualForm $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+                    ->content(fn(?VisualForm $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
                     ->label('Last Modified Date')
-                    ->content(fn (?VisualForm $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                    ->content(fn(?VisualForm $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
 
@@ -68,8 +68,13 @@ class VisualFormResource extends Resource
                     ->sortable(),
 
                 TextColumn::make('description'),
-
-                TextColumn::make('is_active'),
+                TextColumn::make('is_active')->badge()
+                    ->label(__('Active'))
+                    ->color(fn($record) => match ($record->is_active) {
+                        true => 'success',
+                        false => 'danger',
+                    })
+                    ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No'),
             ])
             ->filters([
                 //
@@ -103,6 +108,7 @@ class VisualFormResource extends Resource
     {
         return [
             Resources\VisualFormResource\RelationManagers\FieldsRelationManager::class,
+            Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
         ];
     }
 }

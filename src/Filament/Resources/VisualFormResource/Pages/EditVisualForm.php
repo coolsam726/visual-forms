@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms\Filament\Resources\VisualFormResource\Pages;
 
-use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources\VisualFormResource;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Actions\Action;
@@ -19,10 +18,12 @@ class EditVisualForm extends EditRecord
     {
         return [
             Action::make('preview')->label(__('Preview Form'))
-                ->form(fn(VisualForm $record, Form $form) => $form
+                ->form(fn (VisualForm $record, Form $form) => $form
                     ->columns()
                     ->schema($record->schema()))
-                ->modalCancelActionLabel(__('Close'))->action(function (array $data) {
+                ->modalCancelActionLabel(__('Close'))->action(function (VisualForm $record, array $data) {
+                    \Log::info(collect($data));
+                    $record->recordSubmission($data, isProcessed: true);
                     Notification::make('success')->title('Submitted Data')
                         ->body(json_encode($data))
                         ->success()
