@@ -3,7 +3,6 @@
 namespace Coolsam\VisualForms\Filament\Resources;
 
 use Coolsam\VisualForms\Filament\Resources;
-use Coolsam\VisualForms\Filament\VisualFormResource\Pages;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Placeholder;
@@ -20,11 +19,9 @@ use Illuminate\Support\Str;
 
 class VisualFormResource extends Resource
 {
-
     protected static ?string $slug = 'visual-forms';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
 
     public static function getModel(): string
     {
@@ -38,12 +35,12 @@ class VisualFormResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->live(onBlur: true)
-                    ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                 TextInput::make('slug')
                     ->readOnly()
                     ->required()
-                    ->unique(VisualForm::class, 'slug', fn($record) => $record),
+                    ->unique(VisualForm::class, 'slug', fn ($record) => $record),
 
                 TextInput::make('description'),
 
@@ -51,11 +48,11 @@ class VisualFormResource extends Resource
 
                 Placeholder::make('created_at')
                     ->label('Created Date')
-                    ->content(fn(?VisualForm $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+                    ->content(fn (?VisualForm $record): string => $record?->created_at?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
                     ->label('Last Modified Date')
-                    ->content(fn(?VisualForm $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                    ->content(fn (?VisualForm $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
             ]);
     }
 
@@ -70,11 +67,11 @@ class VisualFormResource extends Resource
                 TextColumn::make('description'),
                 TextColumn::make('is_active')->badge()
                     ->label(__('Active'))
-                    ->color(fn($record) => match ($record->is_active) {
+                    ->color(fn ($record) => match ($record->is_active) {
                         true => 'success',
                         false => 'danger',
                     })
-                    ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No'),
+                    ->formatStateUsing(fn ($state) => $state ? 'Yes' : 'No'),
             ])
             ->filters([
                 //

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class VisualFormField extends Model
 {
     use HasUlids;
+
     protected $guarded = ['id', 'ulid'];
 
     protected $casts = [

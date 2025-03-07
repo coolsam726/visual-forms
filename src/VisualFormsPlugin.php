@@ -16,8 +16,7 @@ class VisualFormsPlugin implements Plugin
     {
         $panel
             ->discoverResources(in: __DIR__ . '/Filament/Resources', for: 'Coolsam\\VisualForms\\Filament\\Resources')
-            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages')
-        ;
+            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages');
     }
 
     public function boot(Panel $panel): void
