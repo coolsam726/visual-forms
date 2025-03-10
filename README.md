@@ -1,8 +1,8 @@
 # Dynamically and Visually create forms in Filament and collect responses
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/coolsam/visual-forms.svg?style=flat-square)](https://packagist.org/packages/coolsam/visual-forms)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/coolsam/visual-forms/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/coolsam726/visual-forms/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/coolsam/visual-forms/fix-php-code-styling.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/coolsam726/visual-forms/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
+[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/coolsam726/visual-forms/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/coolsam726/visual-forms/actions?query=workflow%3Arun-tests+branch%3Amain)
+[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/coolsam726/visual-forms/fix-php-code-styling.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/coolsam726/visual-forms/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/coolsam/visual-forms.svg?style=flat-square)](https://packagist.org/packages/coolsam/visual-forms)
 
 
