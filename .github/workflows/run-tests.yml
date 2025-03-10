@@ -26,7 +26,6 @@ jobs:
             testbench: ^9.0
             carbon: ^2.0
             pest-plugin-laravel: ^3.0
-            stability: prefer-stable
             larastan: ^3.0
           - laravel: 10.*
             testbench: ^8
