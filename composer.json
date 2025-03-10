@@ -26,16 +26,12 @@
         "spatie/laravel-package-tools": "^1.15.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.5",
         "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^v8.6.1",
         "nunomaduro/larastan": "^3.1.0",
         "orchestra/testbench": "^9.12",
-        "pestphp/pest": "^3.7.4",
-        "pestphp/pest-plugin-arch": "^3.0",
         "pestphp/pest-plugin-laravel": "^3.1",
         "phpstan/extension-installer": "^1.4.3",
-        "phpstan/phpstan-deprecation-rules": "^2.0.1",
-        "phpstan/phpstan-phpunit": "^2.0.4",
         "spatie/laravel-ray": "^1.39"
     },
     "autoload": {
@@ -50,7 +46,9 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
+        "post-autoload-dump": [
+            "@php ./vendor/bin/testbench package:discover --ansi"
+        ],
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
