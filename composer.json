@@ -47,8 +47,7 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "@php ./vendor/bin/testbench package:discover --ansi",
-            "@php -r \\\"if (file_exists('artisan') && app()->environment('local') && class_exists('Barryvdh\\\\\\\\LaravelIdeHelper\\\\\\\\IdeHelperServiceProvider')) { \\\\Illuminate\\\\Support\\\\Facades\\\\Artisan::call('ide-helper:generate'); \\\\Illuminate\\\\Support\\\\Facades\\\\Artisan::call('ide-helper:models', ['--nowrite' => true]); }\\\""
+            "@php ./vendor/bin/testbench package:discover --ansi"
         ],
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
