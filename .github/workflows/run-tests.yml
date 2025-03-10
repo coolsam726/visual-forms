@@ -19,12 +19,12 @@ jobs:
         include:
           - laravel: 12.*
             testbench: ^10.0
-            carbon: ^3.8.4
+            carbon: ^3.8.6
             pest-plugin-laravel: ^3.1
             larastan: ^3.1
           - laravel: 11.*
             testbench: ^9.0
-            carbon: ^3.0
+            carbon: ^3.8.4
             pest-plugin-laravel: ^3.0
             larastan: ^3.0
 
