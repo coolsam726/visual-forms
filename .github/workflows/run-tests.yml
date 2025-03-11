@@ -25,8 +25,8 @@ jobs:
           - laravel: 11.*
             testbench: ^9.0
             carbon: ^3.8.4
-            pest-plugin-laravel: ^3.0
-            larastan: ^3.0
+            pest-plugin-laravel: ^3.1
+            larastan: ^3.1
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
