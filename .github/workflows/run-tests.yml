@@ -55,4 +55,4 @@ jobs:
         run: composer show -D
 
       - name: Execute tests
-        run: vendor/bin/pest --ci --coverage --min=10 --coverage-clover=coverage.xml
+        run: vendor/bin/pest --ci --coverage --min=50
