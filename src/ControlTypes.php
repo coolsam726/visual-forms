@@ -51,6 +51,7 @@ enum ControlTypes: string
             self::Textarea->value,
             self::Select->value,
             self::TagsInput->value,
+            self::Radio->value,
         ]);
     }
 

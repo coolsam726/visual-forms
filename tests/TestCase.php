@@ -23,13 +23,14 @@ class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Coolsam\\VisualForms\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
         );
     }
 
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             ActionsServiceProvider::class,
@@ -48,13 +49,12 @@ class TestCase extends Orchestra
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    public function getEnvironmentSetUp($app): void
     {
         config()->set('database.default', 'testing');
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_visual-forms_table.php.stub';
+        $migration = include __DIR__ . '/../database/migrations/create_visual_forms_tables.php.stub';
         $migration->up();
-        */
+
     }
 }
