@@ -48,11 +48,11 @@ class VisualFormResource extends Resource
 
                 Placeholder::make('created_at')
                     ->label('Created Date')
-                    ->content(fn (?VisualForm $record): string => $record?->created_at?->diffForHumans() ?? '-'),
+                    ->content(fn (?VisualForm $record): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
 
                 Placeholder::make('updated_at')
                     ->label('Last Modified Date')
-                    ->content(fn (?VisualForm $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
+                    ->content(fn (?VisualForm $record): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
             ]);
     }
 
@@ -67,9 +67,10 @@ class VisualFormResource extends Resource
                 TextColumn::make('description'),
                 TextColumn::make('is_active')->badge()
                     ->label(__('Active'))
-                    ->color(fn ($record) => match ($record->is_active) {
+                    ->color(fn (VisualForm $record) => match ($record->getAttribute('is_active')) {
                         true => 'success',
                         false => 'danger',
+                        default => 'warning',
                     })
                     ->formatStateUsing(fn ($state) => $state ? 'Yes' : 'No'),
             ])

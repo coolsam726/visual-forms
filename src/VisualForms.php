@@ -125,7 +125,7 @@ class VisualForms
     public function schema(VisualForm $form): array
     {
         // if the form is not active, render a placeholder to show that error
-        if (! $form->is_active) {
+        if (! $form->getAttribute('is_active')) {
             return [
                 Components\Placeholder::make('form_inactive')
                     ->label(new HtmlString("<h3 class='!text-danger-500'>Form Inactive</h3>"))
@@ -140,90 +140,86 @@ class VisualForms
 
     public function makeField(VisualFormField $field)
     {
-        /**
-         * @var Components\TextInput|Components\Select|Components\Field $control
-         */
-        $control = match ($field->control_type) {
-            default => Components\TextInput::make($field->name),
-            ControlTypes::Select->value => Components\Select::make($field->name),
-            ControlTypes::Textarea->value => Components\Textarea::make($field->name),
-            ControlTypes::TagsInput->value => Components\TagsInput::make($field->name),
-            ControlTypes::Radio->value => Components\Radio::make($field->name),
-            ControlTypes::Toggle->value => Components\Toggle::make($field->name),
-            ControlTypes::CheckboxList->value => Components\CheckboxList::make($field->name),
-            ControlTypes::Checkbox->value => Components\Checkbox::make($field->name),
-            ControlTypes::FileUpload->value => Components\FileUpload::make($field->name),
-            ControlTypes::DatePicker->value => Components\DatePicker::make($field->name),
-            ControlTypes::TimePicker->value => Components\TimePicker::make($field->name),
-            ControlTypes::DateTimePicker->value => Components\DateTimePicker::make($field->name),
-            ControlTypes::RichEditor->value => Components\RichEditor::make($field->name),
-            ControlTypes::MarkdownEditor->value => Components\MarkdownEditor::make($field->name),
-            ControlTypes::Repeater->value => Components\Repeater::make($field->name),
-            ControlTypes::KeyValue->value => Components\KeyValue::make($field->name),
-            ControlTypes::ColorPicker->value => Components\ColorPicker::make($field->name),
-            ControlTypes::ToggleButtons->value => Components\ToggleButtons::make($field->name),
-            ControlTypes::TableRepeater->value => TableRepeater::make($field->name),
-            ControlTypes::Hidden->value => Components\Hidden::make($field->name),
+        $control = match ($field->getAttribute(key: 'control_type')) {
+            default => Components\TextInput::make($field->getAttribute('name')),
+            ControlTypes::Select->value => Components\Select::make($field->getAttribute('name')),
+            ControlTypes::Textarea->value => Components\Textarea::make($field->getAttribute('name')),
+            ControlTypes::TagsInput->value => Components\TagsInput::make($field->getAttribute('name')),
+            ControlTypes::Radio->value => Components\Radio::make($field->getAttribute('name')),
+            ControlTypes::Toggle->value => Components\Toggle::make($field->getAttribute('name')),
+            ControlTypes::CheckboxList->value => Components\CheckboxList::make($field->getAttribute('name')),
+            ControlTypes::Checkbox->value => Components\Checkbox::make($field->getAttribute('name')),
+            ControlTypes::FileUpload->value => Components\FileUpload::make($field->getAttribute('name')),
+            ControlTypes::DatePicker->value => Components\DatePicker::make($field->getAttribute('name')),
+            ControlTypes::TimePicker->value => Components\TimePicker::make($field->getAttribute('name')),
+            ControlTypes::DateTimePicker->value => Components\DateTimePicker::make($field->getAttribute('name')),
+            ControlTypes::RichEditor->value => Components\RichEditor::make($field->getAttribute('name')),
+            ControlTypes::MarkdownEditor->value => Components\MarkdownEditor::make($field->getAttribute('name')),
+            ControlTypes::Repeater->value => Components\Repeater::make($field->getAttribute('name')),
+            ControlTypes::KeyValue->value => Components\KeyValue::make($field->getAttribute('name')),
+            ControlTypes::ColorPicker->value => Components\ColorPicker::make($field->getAttribute('name')),
+            ControlTypes::ToggleButtons->value => Components\ToggleButtons::make($field->getAttribute('name')),
+            ControlTypes::TableRepeater->value => TableRepeater::make($field->getAttribute('name')),
+            ControlTypes::Hidden->value => Components\Hidden::make($field->getAttribute('name')),
         };
-        $control->required($field->required)->label($field->label)
-            ->disabled($field->disabled)
-            ->helperText($field->helper_text);
+        $control->required($field->getAttribute('required'))->label($field->getAttribute('label'))
+            ->disabled($field->getAttribute('disabled'))
+            ->helperText($field->getAttribute('helper_text'));
 
-        if ($field->default_value != null) {
-            $control->default($field->default_value);
+        if ($field->getAttribute('default_value') != null) {
+            $control->default($field->getAttribute('default_value'));
         }
-        if (ControlTypes::hasAutocomplete($field->control_type)) {
-            $control->autocomplete($field->autocomplete);
-        }
-
-        if (ControlTypes::hasAutocapitalize($field->control_type)) {
-            $control->autocapitalize($field->autocapitalize);
+        if (ControlTypes::hasAutocomplete($field->getAttribute('control_type'))) {
+            $control->autocomplete($field->getAttribute('autocomplete'));
         }
 
-        if (ControlTypes::hasOptions($field->control_type)) {
+        if (ControlTypes::hasAutocapitalize($field->getAttribute('control_type'))) {
+            $control->autocapitalize($field->getAttribute('autocapitalize'));
+        }
+
+        if (ControlTypes::hasOptions($field->getAttribute('control_type'))) {
             $options = $this->makeOptions($field);
             $control->options($options);
         }
 
-        if ($field->colspan_full) {
+        if ($field->getAttribute('colspan_full')) {
             $control->columnSpanFull();
-        } elseif ($field->colspan > 1) {
-            $control->columnSpan($field->colspan);
+        } elseif ($field->getAttribute('colspan') > 1) {
+            $control->columnSpan($field->getAttribute('colspan'));
         }
 
         // Handle unique
-        if ($field->unique) {
-            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $field->name);
-            if ($field->id) {
-                $rule = $rule->ignore($field->id);
+        if ($field->getAttribute('unique')) {
+            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $field->getAttribute('name'));
+            if ($field->getAttribute('id')) {
+                $rule = $rule->ignore($field->getAttribute('id'));
             }
             $control->rule($rule);
-            //            $control->unique($field->unique, str(\Config::get('visual-forms.tables.visual_form_entries'))->append(',payload->')->append($field->name)->toString());
         }
 
-        if (ControlTypes::hasSearchable($field->control_type)) {
-            $control->searchable($field->searchable);
+        if (ControlTypes::hasSearchable($field->getAttribute('control_type'))) {
+            $control->searchable($field->getAttribute('searchable'));
         }
 
-        if (ControlTypes::hasPlaceholder($field->control_type)) {
-            $control->placeholder($field->placeholder);
+        if (ControlTypes::hasPlaceholder($field->getAttribute('control_type'))) {
+            $control->placeholder($field->getAttribute('placeholder'));
         }
 
-        if (ControlTypes::hasAutofocus($field->control_type)) {
-            $control->autofocus($field->autofocus);
+        if (ControlTypes::hasAutofocus($field->getAttribute('control_type'))) {
+            $control->autofocus($field->getAttribute('autofocus'));
         }
 
-        if (ControlTypes::hasReadonly($field->control_type)) {
-            $control->readonly($field->readonly);
+        if (ControlTypes::hasReadonly($field->getAttribute('control_type'))) {
+            $control->readonly($field->getAttribute('readonly'));
         }
 
-        if (ControlTypes::hasPrefixAndSuffix($field->control_type)) {
-            if ($field->prefix_icon) {
-                $control->prefixIcon($field->prefix_icon)->inlinePrefix($field->inline_prefix);
+        if (ControlTypes::hasPrefixAndSuffix($field->getAttribute('control_type'))) {
+            if ($field->getAttribute('prefix_icon')) {
+                $control->prefixIcon($field->getAttribute('prefix_icon'))->inlinePrefix($field->getAttribute('inline_prefix'));
             }
 
-            if ($field->suffix_icon) {
-                $control->suffixIcon($field->suffix_icon)->inlineSuffix($field->inline_suffix);
+            if ($field->getAttribute('suffix_icon')) {
+                $control->suffixIcon($field->getAttribute('suffix_icon'))->inlineSuffix($field->getAttribute('inline_suffix'));
             }
         }
         $rules = $this->makeRules($field);
@@ -236,10 +232,10 @@ class VisualForms
 
     public function makeRules(VisualFormField $field): array
     {
-        if (! ($field->validation_rules && count($field->validation_rules))) {
+        if (! ($field->getAttribute('validation_rules') && count($field->getAttribute('validation_rules')))) {
             return [];
         }
-        $rules = collect($field->validation_rules);
+        $rules = collect($field->getAttribute('validation_rules'));
 
         return $rules->mapWithKeys(fn (
             $rule
@@ -248,17 +244,17 @@ class VisualForms
 
     public function makeOptions(VisualFormField $field): Collection | array | null
     {
-        if (! ControlTypes::hasOptions($field->control_type)) {
+        if (! ControlTypes::hasOptions($field->getAttribute('control_type'))) {
             return null;
         }
 
-        if ($field->options_from_db) {
-            $table = $field->options_db_table;
+        if ($field->getAttribute('options_from_db')) {
+            $table = $field->getAttribute('options_db_table');
             if (! $table) {
                 return collect();
             }
             $query = \DB::table($table);
-            $conditions = $field->options_where_conditions;
+            $conditions = $field->getAttribute('options_where_conditions');
             if ($conditions && count($conditions)) {
                 $i = 0;
                 foreach ($conditions as $condition) {
@@ -275,17 +271,17 @@ class VisualForms
                     $i++;
                 }
             }
-            if ($field->options_order_by) {
-                $query->orderBy($field->options_order_by, $field->options_order_direction);
+            if ($field->getAttribute('options_order_by')) {
+                $query->orderBy($field->getAttribute('options_order_by'), $field->getAttribute('options_order_direction'));
             }
             $records = $query->get();
 
             return $records
                 ->mapWithKeys(fn ($record) => [
-                    $record->{$field->options_key_attribute} => $record->{$field->options_value_attribute},
+                    $record->{$field->getAttribute('options_key_attribute')} => $record->{$field->getAttribute('options_value_attribute')},
                 ]);
         } else {
-            return collect($field->options)->mapWithKeys(fn ($option) => [$option['value'] => $option['label']]);
+            return collect($field->getAttribute('options'))->mapWithKeys(fn ($option) => [$option['value'] => $option['label']]);
         }
     }
 
