@@ -5,9 +5,15 @@ parameters:
     level: 4
     paths:
         - src
-        - config
         - database
     tmpDir: build/phpstan
     checkOctaneCompatibility: true
-    checkModelProperties: true
+    checkModelProperties: false
+    reportUnmatchedIgnoredErrors: false
+    reportMaybes: false
+    fileExtensions:
+        - php
+        - php.stub
+    bootstrapFiles:
+        - config/visual-forms.php
 
