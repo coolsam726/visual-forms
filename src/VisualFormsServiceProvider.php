@@ -60,6 +60,9 @@ class VisualFormsServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void {}
 
+    /**
+     * @throws \ReflectionException
+     */
     public function packageBooted(): void
     {
         // Asset Registration
