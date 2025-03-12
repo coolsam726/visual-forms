@@ -1,5 +1,6 @@
 <?php
 
+use Coolsam\VisualForms\ControlTypes;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
             $table->string('name');
             $table->ulid()->unique();
-            $table->string('control_type')->default(\Coolsam\VisualForms\ControlTypes::TextInput->name);
+            $table->string('control_type')->default(ControlTypes::TextInput->name);
             $table->string('label')->nullable();
             $table->string('placeholder')->nullable();
 
@@ -59,7 +60,6 @@ return new class extends Migration
             $table->integer('max_files')->nullable();
             $table->json('accepted_file_types')->nullable();
 
-
             $table->string('type')->default('text');
             $table->enum('live_status', ['off', 'on', 'onBlur', 'debounced'])->default('off');
             $table->integer('debounce_time')->default(300);
@@ -88,6 +88,25 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        Schema::create(Config::get('visual-forms.tables.visual_form_components'), function (Blueprint $table) {
+            $table->id();
+            $table->nestedSet();
+            $table->ulid();
+            $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
+            $table->string('name');
+            $table->string('label')->nullable();
+            $table->text('description')->nullable();
+            $table->string('component_type')->default(ControlTypes::Section->name);
+            $table->jsonb('props')->nullable();
+            $table->jsonb('columns')->nullable();
+            $table->jsonb('column_span')->nullable();
+            $table->jsonb('column_start')->nullable();
+            $table->jsonb('validation_rules')->nullable();
+            $table->bigInteger('sort_order')->default(0);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
         // Create Visual Form Entries table
         Schema::create(Config::get('visual-forms.tables.visual_form_entries'), function (Blueprint $table) {
             $table->id();
@@ -105,6 +124,7 @@ return new class extends Migration
     {
         Schema::dropIfExists(Config::get('visual-forms.tables.visual_forms'));
         Schema::dropIfExists(Config::get('visual-forms.tables.visual_form_fields'));
+        Schema::dropIfExists(Config::get('visual-forms.tables.visual_form_components'));
         Schema::dropIfExists(Config::get('visual-forms.tables.visual_form_entries'));
     }
 };

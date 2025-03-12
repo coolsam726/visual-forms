@@ -6,7 +6,9 @@ use Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Split;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -38,7 +40,7 @@ class VisualFormResource extends Resource
                     ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                 TextInput::make('slug')
-                    ->readOnly()
+                    ->readonly()
                     ->required()
                     ->unique(VisualForm::class, 'slug', fn ($record) => $record),
 

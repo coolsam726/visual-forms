@@ -11,6 +11,7 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
+use Kalnoy\Nestedset\NestedSetServiceProvider;
 use Livewire\Features\SupportTesting\Testable;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -58,7 +59,10 @@ class VisualFormsServiceProvider extends PackageServiceProvider
         }
     }
 
-    public function packageRegistered(): void {}
+    public function packageRegistered(): void
+    {
+        $this->app->register(NestedSetServiceProvider::class);
+    }
 
     /**
      * @throws \ReflectionException
@@ -114,9 +118,7 @@ class VisualFormsServiceProvider extends PackageServiceProvider
      */
     protected function getCommands(): array
     {
-        return [
-            VisualFormsCommand::class,
-        ];
+        return [];
     }
 
     /**
