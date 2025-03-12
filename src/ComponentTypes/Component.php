@@ -8,7 +8,9 @@ use Coolsam\VisualForms\Models\VisualFormComponent;
 abstract class Component
 {
     abstract public function getComponentType(): ControlTypes;
+
     abstract public function getSupportedProps(): array;
+
     public function getProps(?VisualFormComponent $component): array
     {
         $supported = $this->getSupportedProps();
@@ -19,6 +21,7 @@ abstract class Component
                 $props[$prop] = $componentProps->get($prop);
             }
         }
+
         return $props;
     }
 

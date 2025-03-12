@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms;
 
-use Coolsam\VisualForms\Commands\VisualFormsCommand;
 use Coolsam\VisualForms\Testing\TestsVisualForms;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;

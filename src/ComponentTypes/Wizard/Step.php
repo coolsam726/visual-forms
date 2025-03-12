@@ -2,7 +2,4 @@
 
 namespace Coolsam\VisualForms\ComponentTypes\Wizard;
 
-class Step
-{
-
-}
+class Step {}

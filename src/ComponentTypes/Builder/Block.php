@@ -2,7 +2,4 @@
 
 namespace Coolsam\VisualForms\ComponentTypes\Builder;
 
-class Block
-{
-
-}
+class Block {}

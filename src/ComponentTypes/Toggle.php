@@ -2,7 +2,4 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class Toggle
-{
-
-}
+class Toggle {}

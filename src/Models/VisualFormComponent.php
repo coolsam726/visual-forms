@@ -35,6 +35,7 @@ class VisualFormComponent extends Model
     public function getProps()
     {
         $class = $this->getAttribute('component_type');
+
         return (new $class)->getProps($this);
     }
 }
