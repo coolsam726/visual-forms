@@ -38,7 +38,6 @@ class ComponentsRelationManager extends RelationManager
             ]);
     }
 
-
     public function table(Table $table): Table
     {
         return $table
@@ -50,8 +49,9 @@ class ComponentsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make()->mutateFormDataUsing(function(array $data) {
+                Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data) {
                     dd($data);
+
                     return $data;
                 }),
             ])

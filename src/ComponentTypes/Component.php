@@ -13,7 +13,6 @@ abstract class Component
     abstract public function getSupportedProps(): array;
 
     public function getProps(): array
-
     {
         $component = $this->record;
         $supported = $this->getSupportedProps();
@@ -27,6 +26,7 @@ abstract class Component
 
         return $props;
     }
+
     public function getRecord(): ?VisualFormComponent
     {
         return $this->record;

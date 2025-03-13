@@ -14,6 +14,7 @@ class Utils
             $namespace .= '\\' . str_replace(DIRECTORY_SEPARATOR, '\\', $path);
         }
         $namespace .= '\\' . $file->getBasename('.php');
+
         return $namespace;
     }
 

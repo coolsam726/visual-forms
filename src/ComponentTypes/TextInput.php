@@ -71,20 +71,20 @@ class TextInput extends Component
             ])->columns(),
             \Filament\Forms\Components\Fieldset::make(__('Flags'))
                 ->statePath('props')
-                ->schema(fn() => [
-                    ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === Boolean::class)
-                        ->map(fn($type, $name) => \Filament\Forms\Components\Checkbox::make($name))
-                        ->toArray()
+                ->schema(fn () => [
+                    ...collect($this->getSupportedProps())->filter(fn ($type, $name) => $type === Boolean::class)
+                        ->map(fn ($type, $name) => \Filament\Forms\Components\Checkbox::make($name))
+                        ->toArray(),
                 ])->columns(3),
-            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn() => [
-                ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === Integer::class)
-                    ->map(fn($type, $name) => \Filament\Forms\Components\TextInput::make($name)->integer())
-                    ->toArray()
+            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn () => [
+                ...collect($this->getSupportedProps())->filter(fn ($type, $name) => $type === Integer::class)
+                    ->map(fn ($type, $name) => \Filament\Forms\Components\TextInput::make($name)->integer())
+                    ->toArray(),
             ])->columns(2),
-            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn() => [
-                ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === String_::class)
-                    ->map(fn($type, $name) => \Filament\Forms\Components\TextInput::make($name))
-                    ->toArray()
+            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn () => [
+                ...collect($this->getSupportedProps())->filter(fn ($type, $name) => $type === String_::class)
+                    ->map(fn ($type, $name) => \Filament\Forms\Components\TextInput::make($name))
+                    ->toArray(),
             ])->columns(2),
         ];
     }
