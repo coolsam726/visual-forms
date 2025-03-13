@@ -2,17 +2,20 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\ControlTypes;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 
 abstract class Component
 {
-    abstract public function getComponentType(): ControlTypes;
+    public function __construct(private readonly ?VisualFormComponent $record = null) {}
+
+    abstract public function getOptionName(): string;
 
     abstract public function getSupportedProps(): array;
 
-    public function getProps(?VisualFormComponent $component): array
+    public function getProps(): array
+
     {
+        $component = $this->record;
         $supported = $this->getSupportedProps();
         $props = [];
         if ($component) {
@@ -24,6 +27,12 @@ abstract class Component
 
         return $props;
     }
+    public function getRecord(): ?VisualFormComponent
+    {
+        return $this->record;
+    }
 
-    abstract public function makeComponent(VisualFormComponent $component);
+    abstract public function makeComponent();
+
+    abstract public function getBackendSchema(): array;
 }

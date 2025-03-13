@@ -2,8 +2,7 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\ControlTypes;
-use Coolsam\VisualForms\Models\VisualFormComponent;
+use Filament\Forms\Set;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
 use phpDocumentor\Reflection\Types\Integer;
@@ -11,6 +10,11 @@ use phpDocumentor\Reflection\Types\String_;
 
 class TextInput extends Component
 {
+    public function getOptionName(): string
+    {
+        return __('Text Input');
+    }
+
     public function getSupportedProps(): array
     {
         return [
@@ -49,114 +53,54 @@ class TextInput extends Component
         ];
     }
 
-    public function getComponentType(): ControlTypes
+    /**
+     * The schema that will be rendered when creating the VisualFormComponent of this type.
+     */
+    public function getBackendSchema(): array
     {
-        return ControlTypes::TextInput;
+        return [
+            \Filament\Forms\Components\Fieldset::make(__('Common Details'))->schema([
+                \Filament\Forms\Components\TextInput::make('name')->label(__('Field Name'))
+                    ->hint(__('e.g first_name'))
+                    ->required()
+                    ->live(debounce: 500)
+                    ->afterStateUpdated(fn ($state, Set $set) => $set('label', str($state)->camel()->snake()->title()->replace('_', ' '))),
+                \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
+                    ->required()
+                    ->hint(__('e.g First Name')),
+            ])->columns(),
+            \Filament\Forms\Components\Fieldset::make(__('Flags'))
+                ->statePath('props')
+                ->schema(fn() => [
+                    ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === Boolean::class)
+                        ->map(fn($type, $name) => \Filament\Forms\Components\Checkbox::make($name))
+                        ->toArray()
+                ])->columns(3),
+            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn() => [
+                ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === Integer::class)
+                    ->map(fn($type, $name) => \Filament\Forms\Components\TextInput::make($name)->integer())
+                    ->toArray()
+            ])->columns(2),
+            \Filament\Forms\Components\Fieldset::make(__('Other Properties'))->statePath('props')->schema(fn() => [
+                ...collect($this->getSupportedProps())->filter(fn($type, $name) => $type === String_::class)
+                    ->map(fn($type, $name) => \Filament\Forms\Components\TextInput::make($name))
+                    ->toArray()
+            ])->columns(2),
+        ];
     }
 
-    public function makeComponent(VisualFormComponent $component): \Filament\Forms\Components\TextInput
+    /**
+     * @throws \Exception
+     */
+    public function makeComponent(): \Filament\Forms\Components\TextInput
     {
-        $props = collect($component->getProps());
-        $control = \Filament\Forms\Components\TextInput::make($component->getAttribute('name'));
-        if ($props->has('autocapitalize')) {
-            $control->autocapitalize($props->get('autocapitalize'));
+        $record = $this->getRecord();
+        if (! $record) {
+            throw new \Exception('Record is required to make a component');
         }
-        if ($props->has('autocomplete')) {
-            $control->autocomplete($props->get('autocomplete'));
-        }
-        if ($props->get('length')) {
-            $control->length($props->get('length'));
-        }
-        if ($props->get('maxLength')) {
-            $control->maxLength($props->get('maxLength'));
-        }
-        if ($props->get('minLength') && $props->get('minLength') > 0) {
-            $control->minLength($props->get('minLength'));
-        }
+        $control = \Filament\Forms\Components\TextInput::make($record->getAttribute('name'));
 
-        if ($props->get('readOnly')) {
-            $control->readOnly();
-        }
-        if ($props->get('prefix')) {
-            $control->prefix($props->get('prefix'));
-        }
-        if ($props->get('suffix')) {
-            $control->suffix($props->get('suffix'));
-        }
-        if ($props->get('prefixIcon')) {
-            $control->prefixIcon($props->get('prefixIcon'));
-        }
-        if ($props->get('suffixIcon')) {
-            $control->suffixIcon($props->get('suffixIcon'));
-        }
-        if ($props->get('inlinePrefix')) {
-            $control->inlinePrefix();
-        }
-        if ($props->get('inlineSuffix')) {
-            $control->inlineSuffix();
-        }
-        if ($props->get('prefixIconColor')) {
-            $control->prefixIconColor($props->get('prefixIconColor'));
-        }
-        if ($props->get('suffixIconColor')) {
-            $control->suffixIconColor($props->get('suffixIconColor'));
-        }
-        if ($props->get('datalist')) {
-            $control->datalist($props->get('datalist'));
-        }
-        if ($props->get('extraInputAttributes')) {
-            $control->extraInputAttributes($props->get('extraInputAttributes'));
-        }
-        if ($props->get('inputMode')) {
-            $control->inputMode($props->get('inputMode'));
-        }
-
-        if ($props->get('placeholder')) {
-            $control->placeholder($props->get('placeholder'));
-        }
-        if ($props->get('step')) {
-            $control->step($props->get('step'));
-        }
-        if ($props->get('currentPassword')) {
-            $control->currentPassword();
-        }
-        if ($props->get('email')) {
-            $control->email();
-        }
-        if ($props->get('integer')) {
-            $control->integer();
-        }
-        if ($props->get('mask')) {
-            $control->mask($props->get('mask'));
-        }
-        if ($props->get('maxValue')) {
-            $control->maxValue($props->get('maxValue'));
-        }
-        if ($props->get('minValue')) {
-            $control->minValue($props->get('minValue'));
-        }
-        if ($props->get('numeric')) {
-            $control->numeric();
-        }
-        if ($props->get('password')) {
-            $control->password();
-        }
-        if ($props->get('revealable')) {
-            $control->revealable();
-        }
-        if ($props->get('tel')) {
-            $control->tel();
-        }
-        if ($props->get('telRegex')) {
-            $control->telRegex($props->get('telRegex'));
-        }
-        if ($props->get('type')) {
-            $control->type($props->get('type'));
-        }
-        if ($props->get('url')) {
-            $control->url();
-        }
-
+        // TODO: Make the text input
         return $control;
     }
 }

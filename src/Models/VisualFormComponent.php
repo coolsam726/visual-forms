@@ -2,8 +2,10 @@
 
 namespace Coolsam\VisualForms\Models;
 
+use Config;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Kalnoy\Nestedset\NodeTrait;
 
 class VisualFormComponent extends Model
@@ -27,9 +29,9 @@ class VisualFormComponent extends Model
         return ['ulid'];
     }
 
-    public function visualForm(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function visualForm(): BelongsTo
     {
-        return $this->belongsTo(\Config::get('visual-forms.models.visual_form'), 'form_id');
+        return $this->belongsTo(Config::get('visual-forms.models.visual_form'), 'form_id');
     }
 
     public function getProps()

@@ -3,6 +3,7 @@
 namespace Coolsam\VisualForms;
 
 use Awcodes\TableRepeater\Components\TableRepeater;
+use Coolsam\VisualForms\ComponentTypes\Component;
 use Coolsam\VisualForms\Models\VisualForm;
 use Coolsam\VisualForms\Models\VisualFormField;
 use Filament\Forms\Components;
@@ -10,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
+use Symfony\Component\Finder\SplFileInfo;
 
 class VisualForms
 {
@@ -21,6 +23,18 @@ class VisualForms
             ->pluck('value', 'name')
             ->mapWithKeys(fn ($value, $key) => [
                 $key => str($value)->camel()->snake()->title()->explode('_')->join(' '),
+            ]);
+    }
+
+    public function getComponentTypeOptions(): Collection
+    {
+        $files = \File::allFiles(__DIR__ . '/ComponentTypes');
+
+        return collect($files)
+            ->map(fn (SplFileInfo $file) => Utils::getFileNamespace($file, 'Coolsam\VisualForms\ComponentTypes'))
+            ->filter(fn ($class) => is_subclass_of($class, Component::class))
+            ->mapWithKeys(fn (string $class) => [
+                $class => class_exists($class) ? (new $class)->getOptionName() : str($class)->afterLast('\\')->camel()->snake()->title()->explode('_')->join(' '),
             ]);
     }
 
