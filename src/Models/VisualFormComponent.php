@@ -3,6 +3,7 @@
 namespace Coolsam\VisualForms\Models;
 
 use Config;
+use Coolsam\VisualForms\Utils;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,5 +42,11 @@ class VisualFormComponent extends Model
         $class = $this->getAttribute('component_type');
 
         return (new $class)->getProps($this);
+    }
+
+    public function makeComponent()
+    {
+        $class = $this->getAttribute('component_type');
+        return Utils::instantiateClass($class, ['record' => $this])->makeComponent();
     }
 }

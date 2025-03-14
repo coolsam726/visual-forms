@@ -6,12 +6,7 @@ class Select extends Component
 {
     public function getOptionName(): string
     {
-        return __('Section');
-    }
-
-    public function getSupportedProps(): array
-    {
-        return [];
+        return __('Select');
     }
 
     public function isLayout(): bool

@@ -5,6 +5,7 @@ namespace Coolsam\VisualForms;
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Coolsam\VisualForms\ComponentTypes\Component;
 use Coolsam\VisualForms\Models\VisualForm;
+use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Models\VisualFormField;
 use Filament\Forms\Components;
 use Illuminate\Support\Collection;
@@ -149,9 +150,10 @@ class VisualForms
             ];
         }
 
-        return $form->fields()->orderBy('sort_order')->get()->map(fn (
-            VisualFormField $field
-        ) => $this->makeField($field))->toArray();
+        return $form->children()->where('is_active', true)->whereNull('parent_id')
+            ->orderBy('sort_order')->get()->map(fn (
+                VisualFormComponent $field
+            ) => $field->makeComponent())->toArray();
     }
 
     /**

@@ -6,17 +6,17 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Models\VisualFormComponent;
+use Coolsam\VisualForms\Utils;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Illuminate\Support\Collection;
 
 abstract class Component
 {
     public function __construct(private readonly ?VisualFormComponent $record = null) {}
 
     abstract public function getOptionName(): string;
-
-    abstract public function getSupportedProps(): array;
 
     abstract public function isLayout(): bool;
 
@@ -215,7 +215,7 @@ abstract class Component
 
         return [
             ...$schema,
-            \Filament\Forms\Components\Fieldset::make(__('Extra Validation Rules'))->schema([
+            \Filament\Forms\Components\Fieldset::make(__('Custom Validation Rules'))->schema([
                 TableRepeater::make('validation_rules')
                     ->headers([
                         Header::make('key')->label(__('Rule')),
@@ -252,5 +252,98 @@ abstract class Component
         return $rules->mapWithKeys(fn (
             $rule
         ) => [$rule['key'] => $rule['key'] ? "{$rule['key']}:{$rule['value']}" : $rule['value']])->values()->toArray();
+    }
+
+    protected function prepareColumns(): Collection
+    {
+        $columns = $this->getRecord()->getAttribute('columns');
+        if (! $columns) {
+            return collect([]);
+        }
+
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+    }
+
+    protected function prepareColumnStart(): Collection
+    {
+        $props = collect($this->getRecord()->getAttribute('props'));
+        if (Utils::getBool($props->get('column_span_full'))) {
+            return collect([]);
+        }
+        $columns = $this->getRecord()->getAttribute('column_start');
+        if (! $columns) {
+            return collect([]);
+        }
+
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+    }
+
+    protected function prepareColumnSpan(): Collection
+    {
+        $props = collect($this->getRecord()->getAttribute('props'));
+        if (Utils::getBool($props->get('column_span_full'))) {
+            return collect([]);
+        }
+        $columns = $this->getRecord()->getAttribute('column_span');
+        if (! $columns) {
+            return collect();
+        }
+
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+    }
+
+    protected function prepareValidationRules(): Collection
+    {
+        $rules = $this->getRecord()->getAttribute('validation_rules');
+        if (! $rules) {
+            return collect();
+        }
+
+        return collect($rules)->map(fn ($rule) => $rule['value'] ? "{$rule['key']}:{$rule['value']}" : $rule['key']);
+    }
+
+    protected function makeColumns(&$control)
+    {
+        $record = $this->getRecord();
+        // Columns
+        $columns = $this->prepareColumns();
+        if ($columns->isNotEmpty()) {
+            $control->columns($columns->toArray());
+        }
+
+        if (Utils::getBool($record->getAttribute('column_span_full'))) {
+            $control->columnSpanFull();
+        } else {
+            $columnStart = $this->prepareColumnStart();
+            if ($columnStart->isNotEmpty()) {
+                $control->columnStart($columnStart);
+            }
+            $colspan = $this->prepareColumnSpan();
+            if ($colspan->isNotEmpty()) {
+                $control->columnSpan($colspan->toArray());
+            }
+        }
+
+        return $control;
+    }
+
+    protected function makeChildren(): array
+    {
+        $record = $this->getRecord();
+        if (! $record->getAttribute('is_active')) {
+            return [];
+        }
+        if (Utils::instantiateClass($record->getAttribute('component_type'))->hasChildren()) {
+            $children = $record->children()->where('is_active', '=', true)->get();
+            $schema = [];
+            foreach ($children as $child) {
+                $component = Utils::instantiateClass($child->getAttribute('component_type'), ['record' => $child]);
+                $schema[] = $component->makeComponent();
+            }
+
+            return $schema;
+        } else {
+            return [];
+        }
     }
 }
