@@ -33,6 +33,7 @@ class Section extends Component
 
         $this->makeColumns($component);
         $component->schema($this->makeChildren());
+
         return $component;
     }
 

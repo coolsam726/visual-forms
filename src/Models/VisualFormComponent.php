@@ -47,6 +47,7 @@ class VisualFormComponent extends Model
     public function makeComponent()
     {
         $class = $this->getAttribute('component_type');
+
         return Utils::instantiateClass($class, ['record' => $this])->makeComponent();
     }
 }
