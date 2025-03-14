@@ -22,6 +22,8 @@ class VisualFormComponent extends Model
         'columns' => 'array',
         'column_span' => 'array',
         'column_start' => 'array',
+        'state_conditions' => 'array',
+        'column_span_full' => 'boolean',
     ];
 
     public function uniqueIds(): array

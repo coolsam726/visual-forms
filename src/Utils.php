@@ -22,4 +22,9 @@ class Utils
     {
         return new $namespace(...$args);
     }
+
+    public static function getBool(string $boolValue): bool
+    {
+        return filter_var($boolValue, FILTER_VALIDATE_BOOLEAN);
+    }
 }

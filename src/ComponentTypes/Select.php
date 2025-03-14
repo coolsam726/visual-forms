@@ -2,4 +2,40 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class Select {}
+class Select extends Component
+{
+    public function getOptionName(): string
+    {
+        return __('Section');
+    }
+
+    public function getSupportedProps(): array
+    {
+        return [];
+    }
+
+    public function isLayout(): bool
+    {
+        return true;
+    }
+
+    public function hasChildren(): bool
+    {
+        return true;
+    }
+
+    public function makeComponent(): array
+    {
+        return [];
+    }
+
+    public function getMainSchema(): array
+    {
+        return $this->extendCommonSchema([]);
+    }
+
+    public function getValidationSchema(): array
+    {
+        return [];
+    }
+}

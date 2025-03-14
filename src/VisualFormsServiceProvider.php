@@ -34,6 +34,7 @@ class VisualFormsServiceProvider extends PackageServiceProvider
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile()
+                    ->publishAssets()
                     ->publishMigrations()
                     ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('coolsam/visual-forms');

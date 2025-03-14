@@ -2,61 +2,71 @@
 
 namespace Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers;
 
-use Coolsam\VisualForms\Facades\VisualForms;
+use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
+use Coolsam\VisualForms\Models\VisualForm;
+use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\HtmlString;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ComponentsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'components';
+    protected static string $relationship = 'children';
+
+    public static function canViewForRecord(Model | VisualForm | VisualFormComponent $ownerRecord, string $pageClass): bool
+    {
+        return parent::canViewForRecord($ownerRecord, $pageClass) && ($ownerRecord instanceof VisualForm || ($ownerRecord instanceof VisualFormComponent && Utils::instantiateClass($ownerRecord->component_type)->hasChildren()));
+    }
 
     public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Step 1: Component Type')->schema([
-                        Forms\Components\Select::make('component_type')
-                            ->required()
-                            ->live()
-                            ->searchable()
-                            ->options(VisualForms::getComponentTypeOptions()),
-                    ]),
-                    Forms\Components\Wizard\Step::make('Step 2: Component Details')
-                        ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
-                            Utils::instantiateClass($get('component_type'))->getBackendSchema()),
-
-                ])->columnSpanFull(),
-                Forms\Components\Placeholder::make('info')
-                    ->content(fn (Forms\Get $get) => new HtmlString($get('component_type')))
-                    ->columnSpanFull(),
-            ]);
+            ->schema(VisualFormComponentResource::getSchema());
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('label')
+            ->modifyQueryUsing(function (Builder $query) {
+                if ($this->ownerRecord instanceof VisualForm) {
+                    $query->whereNull('parent_id');
+                }
+                $query->orderBy('sort_order');
+
+                return $query;
+            })
+            ->reorderable('sort_order')
             ->columns([
-                Tables\Columns\TextColumn::make('label'),
+                Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('label')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('component_type')->searchable()->sortable()->formatStateUsing(function (string $state) {
+                    return Utils::instantiateClass($state)->getOptionName();
+                }),
+                Tables\Columns\IconColumn::make('is_active')->boolean()->label(__('Active')),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data) {
-                    dd($data);
+                    if ($this->ownerRecord instanceof VisualFormComponent) {
+                        $data['form_id'] = $this->ownerRecord->getAttribute('form_id');
+                    }
 
                     return $data;
                 }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('manage')->label(__('Manage'))
+                    ->icon('heroicon-o-chevron-double-right')
+                    ->color('success')
+                    ->url(fn (VisualFormComponent $record) => VisualFormComponentResource::getUrl('edit', ['record' => $record->getKey()])),
+                Tables\Actions\EditAction::make()->color('warning'),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

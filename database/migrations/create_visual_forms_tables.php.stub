@@ -96,14 +96,18 @@ return new class extends Migration
             $table->string('name');
             $table->string('label')->nullable();
             $table->text('description')->nullable();
-            $table->string('component_type')->default(ControlTypes::Section->name);
+            $table->text('helper_text')->nullable();
+            $table->text('hint')->nullable();
+            $table->string('component_type')->comment('The full class name of the component type to aid in making the component dynamic');
             $table->jsonb('props')->nullable();
             $table->jsonb('columns')->nullable();
             $table->jsonb('column_span')->nullable();
             $table->jsonb('column_start')->nullable();
+            $table->jsonb('state_conditions')->nullable()->comment('Conditions to control the state of the component e.g hide/show, disable, readonly, required etc');
             $table->jsonb('validation_rules')->nullable();
             $table->bigInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->boolean('column_span_full')->default(false);
             $table->timestamps();
         });
 
