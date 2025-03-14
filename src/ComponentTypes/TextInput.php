@@ -25,8 +25,6 @@ class TextInput extends Component
         return false;
     }
 
-
-
     public function getSupportedProps(): array
     {
         return [

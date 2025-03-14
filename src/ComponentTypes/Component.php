@@ -212,6 +212,7 @@ abstract class Component
     protected function extendValidationSchema(array $schema = []): array
     {
         $options = VisualForms::getValidationRules();
+
         return [
             ...$schema,
             \Filament\Forms\Components\Fieldset::make(__('Extra Validation Rules'))->schema([
