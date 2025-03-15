@@ -4,7 +4,6 @@ namespace Coolsam\VisualForms\ComponentTypes;
 
 use Coolsam\VisualForms\Utils;
 use Exception;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Get;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
