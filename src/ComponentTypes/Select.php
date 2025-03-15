@@ -33,4 +33,9 @@ class Select extends Component
     {
         return [];
     }
+
+    public function getColumnsSchema(): array
+    {
+        return $this->extendColumnsSchema();
+    }
 }

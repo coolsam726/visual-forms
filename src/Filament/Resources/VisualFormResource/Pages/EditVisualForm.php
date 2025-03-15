@@ -18,6 +18,8 @@ class EditVisualForm extends EditRecord
     {
         return [
             Action::make('preview')->label(__('Preview Form'))
+                ->modalWidth('container')
+                ->slideOver()
                 ->form(fn (VisualForm $record, Form $form) => $form
                     ->columns()
                     ->schema($record->schema()))

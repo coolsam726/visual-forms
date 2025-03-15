@@ -17,6 +17,21 @@ class ComponentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'children';
 
+    protected function configureCreateAction(Tables\Actions\CreateAction $action): void
+    {
+        parent::configureCreateAction($action);
+        $action->slideOver()->modalWidth('container');
+    }
+
+    protected function configureEditAction(Tables\Actions\EditAction $action): void
+    {
+        parent::configureEditAction($action);
+
+        $action
+            ->slideOver()
+            ->modalWidth('container');
+    }
+
     public static function canViewForRecord(Model | VisualForm | VisualFormComponent $ownerRecord, string $pageClass): bool
     {
         return parent::canViewForRecord($ownerRecord, $pageClass) && ($ownerRecord instanceof VisualForm || ($ownerRecord instanceof VisualFormComponent && Utils::instantiateClass($ownerRecord->component_type)->hasChildren()));

@@ -104,21 +104,27 @@ class VisualFormComponentResource extends Resource
     {
         return [
             Forms\Components\Wizard::make([
-                Forms\Components\Wizard\Step::make('Step 1: Component Type')->schema([
+                Forms\Components\Wizard\Step::make(__('Step 1: Component Type'))->schema([
                     Forms\Components\Select::make('component_type')
                         ->required()
                         ->live()
                         ->searchable()
                         ->options(VisualForms::getComponentTypeOptions()),
                 ]),
-                Forms\Components\Wizard\Step::make('Step 2: Component Details')
+                Forms\Components\Wizard\Step::make(__('Step 2: Component Details'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getMainSchema()),
-                Forms\Components\Wizard\Step::make('Step 3: Validation Rules')
+                Forms\Components\Wizard\Step::make(__('Step 3: Configure Columns'))
+                    ->schema(
+                        fn (Forms\Get $get) => ! $get('component_type') ? [] :
+                        Utils::instantiateClass($get('component_type'))->getColumnsSchema()
+                    ),
+                Forms\Components\Wizard\Step::make(__('Step 4: Validation Rules'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getValidationSchema())
-                    ->visible(fn (Forms\Get $get) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
-
+                    ->visible(fn (
+                        Forms\Get $get
+                    ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
             ])
                 ->extraAttributes(['class' => 'fi-fo-wizard-vertical'])
                 ->columnSpanFull(),

@@ -103,6 +103,7 @@ return new class extends Migration
             $table->jsonb('columns')->nullable();
             $table->jsonb('column_span')->nullable();
             $table->jsonb('column_start')->nullable();
+            $table->string('state_path')->nullable();
             $table->jsonb('state_conditions')->nullable()->comment('Conditions to control the state of the component e.g hide/show, disable, readonly, required etc');
             $table->jsonb('validation_rules')->nullable();
             $table->bigInteger('sort_order')->default(0);

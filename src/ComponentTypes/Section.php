@@ -46,4 +46,9 @@ class Section extends Component
     {
         return $this->extendValidationSchema();
     }
+
+    public function getColumnsSchema(): array
+    {
+        return $this->extendColumnsSchema();
+    }
 }
