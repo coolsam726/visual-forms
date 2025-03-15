@@ -1,1 +1,33 @@
 @import '../../vendor/filament/filament/resources/css/theme.css';
+
+.fi-fo-wizard-vertical {
+    @apply grid md:grid-cols-8
+}
+
+.fi-fo-wizard-vertical .fi-fo-wizard-header {
+    grid-auto-flow: row !important;
+    align-content: flex-start;
+    @apply md:divide-y !important;
+    @apply border-b-0 border-e;
+    @apply md:col-span-2
+}
+
+.fi-fo-wizard-vertical .fi-fo-wizard-header-step {
+    @apply block
+}
+
+.fi-fo-wizard-vertical .fi-fo-wizard-header-step-button {
+    @apply w-full
+}
+
+.fi-fo-wizard-vertical .fi-fo-wizard-header-step-separator {
+    display: none !important;
+}
+
+.fi-fo-wizard-vertical .fi-fo-wizard-step {
+    @apply md:col-span-6
+}
+
+.fi-fo-wizard-vertical > div:last-child {
+    @apply md:col-span-8 border-t pt-6
+}

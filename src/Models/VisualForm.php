@@ -24,6 +24,11 @@ class VisualForm extends Model
         return $this->hasMany(\Config::get('visual-forms.models.visual_form_field'), 'form_id');
     }
 
+    public function children(): HasMany
+    {
+        return $this->hasMany(\Config::get('visual-forms.models.visual_form_component'), 'form_id');
+    }
+
     public function entries(): HasMany
     {
         return $this->hasMany(\Config::get('visual-forms.models.visual_form_entry'), 'form_id');

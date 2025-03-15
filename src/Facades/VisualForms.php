@@ -13,4 +13,9 @@ class VisualForms extends Facade
     {
         return \Coolsam\VisualForms\VisualForms::class;
     }
+
+    public static function accessor(): string
+    {
+        return static::getFacadeAccessor();
+    }
 }
