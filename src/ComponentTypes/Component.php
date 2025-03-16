@@ -242,9 +242,10 @@ abstract class Component
         if (! $this->getRecord()) {
             return [];
         }
-        $rules = $this->record->getAttribute('validation_rules') ?? [];
-        if (! count($rules)) {
-            return $rules;
+        $rules = collect($this->getRecord()->getAttribute('validation_rules') ?? []);
+
+        if ($rules->isEmpty()) {
+            return [];
         }
 
         return $rules->mapWithKeys(fn (
@@ -323,6 +324,20 @@ abstract class Component
         }
 
         return $control;
+    }
+
+    public function makeValidation($component): void
+    {
+        if (! $this->getRecord()) {
+            return;
+        }
+        if ($this->isLayout()) {
+            return;
+        }
+        $rules = $this->makeRules();
+        if (count($rules)) {
+            $component->rules($rules);
+        }
     }
 
     protected function makeChildren(): array
