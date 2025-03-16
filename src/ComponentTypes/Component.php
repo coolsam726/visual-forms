@@ -361,6 +361,7 @@ abstract class Component
             }
             $component->rule($rule);
         }
+
         return $component;
     }
 }
