@@ -6,6 +6,7 @@ use Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -32,27 +33,29 @@ class VisualFormResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->required()
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                Section::make([
+                    TextInput::make('name')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
-                TextInput::make('slug')
-                    ->readOnly()
-                    ->required()
-                    ->unique(VisualForm::class, 'slug', fn ($record) => $record),
+                    TextInput::make('slug')
+                        ->readonly()
+                        ->required()
+                        ->unique(VisualForm::class, 'slug', fn ($record) => $record),
 
-                TextInput::make('description'),
+                    TextInput::make('description'),
 
-                Checkbox::make('is_active')->default(true),
+                    Checkbox::make('is_active')->default(true),
 
-                Placeholder::make('created_at')
-                    ->label('Created Date')
-                    ->content(fn (?VisualForm $record): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
+                    Placeholder::make('created_at')
+                        ->label('Created Date')
+                        ->content(fn (?VisualForm $record): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
 
-                Placeholder::make('updated_at')
-                    ->label('Last Modified Date')
-                    ->content(fn (?VisualForm $record): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
+                    Placeholder::make('updated_at')
+                        ->label('Last Modified Date')
+                        ->content(fn (?VisualForm $record): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
+                ])->columns(),
             ]);
     }
 
@@ -105,6 +108,7 @@ class VisualFormResource extends Resource
     public static function getRelations(): array
     {
         return [
+            Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
             Resources\VisualFormResource\RelationManagers\FieldsRelationManager::class,
             Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
         ];

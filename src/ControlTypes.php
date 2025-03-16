@@ -23,8 +23,22 @@ enum ControlTypes: string
     case KeyValue = 'KeyValue';
     case ColorPicker = 'ColorPicker';
     case ToggleButtons = 'ToggleButtons';
-
     case TableRepeater = 'TableRepeater';
+
+    // Layouts
+    case Section = 'Section';
+    case Fieldset = 'Fieldset';
+    case Grid = 'Grid';
+    case Tabs = 'Tabs';
+    case Tab = 'TabsTab';
+    case Wizard = 'Wizard';
+    case Step = 'WizardStep';
+    case Split = 'Split';
+    case Placeholder = 'Placeholder';
+
+    case Builder = 'Builder';
+
+    case Block = 'BuilderBlock';
 
     public static function hasAutocomplete(string $controlType): bool
     {

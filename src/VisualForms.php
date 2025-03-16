@@ -3,17 +3,22 @@
 namespace Coolsam\VisualForms;
 
 use Awcodes\TableRepeater\Components\TableRepeater;
+use Coolsam\VisualForms\ComponentTypes\Component;
 use Coolsam\VisualForms\Models\VisualForm;
+use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Models\VisualFormField;
 use Filament\Forms\Components;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
+use Symfony\Component\Finder\SplFileInfo;
 
 class VisualForms
 {
-    // Enum of control types
+    /**
+     * @deprecated This will be removed once we switch to components. Replaced by getComponentTypeOptions()
+     */
     public function getControlTypeOptions(): Collection
     {
         // get options from ControlTypes enum, as a key value array
@@ -21,6 +26,18 @@ class VisualForms
             ->pluck('value', 'name')
             ->mapWithKeys(fn ($value, $key) => [
                 $key => str($value)->camel()->snake()->title()->explode('_')->join(' '),
+            ]);
+    }
+
+    public function getComponentTypeOptions(): Collection
+    {
+        $files = \File::allFiles(__DIR__ . '/ComponentTypes');
+
+        return collect($files)
+            ->map(fn (SplFileInfo $file) => Utils::getFileNamespace($file, 'Coolsam\VisualForms\ComponentTypes'))
+            ->filter(fn ($class) => is_subclass_of($class, Component::class))
+            ->mapWithKeys(fn (string $class) => [
+                $class => class_exists($class) ? (new $class)->getOptionName() : str($class)->afterLast('\\')->camel()->snake()->title()->explode('_')->join(' '),
             ]);
     }
 
@@ -119,7 +136,7 @@ class VisualForms
             'ulid',
             'url',
             'uuid',
-        ])->mapWithKeys(fn ($rule) => [$rule => str($rule)->camel()->snake()->title()->explode('_')->join(' ')]);
+        ])->mapWithKeys(fn ($rule) => [$rule => $rule]);
     }
 
     public function schema(VisualForm $form): array
@@ -133,11 +150,17 @@ class VisualForms
             ];
         }
 
-        return $form->fields()->orderBy('sort_order')->get()->map(fn (
-            VisualFormField $field
-        ) => $this->makeField($field))->toArray();
+        return $form->children()->where('is_active', true)->whereNull('parent_id')
+            ->orderBy('sort_order')->get()->map(fn (
+                VisualFormComponent $field
+            ) => $field->makeComponent())->toArray();
     }
 
+    /**
+     * @deprecated Will be removed once we switch to components. Replaced by makeComponent()
+     *
+     * @return TableRepeater|Components\Checkbox|Components\DatePicker|Components\FileUpload|Components\Hidden|Components\KeyValue|Components\MarkdownEditor|Components\Radio|Components\Repeater|Components\RichEditor|Components\Select|Components\Textarea|Components\TextInput|Components\TimePicker|Components\ToggleButtons
+     */
     public function makeField(VisualFormField $field)
     {
         $control = match ($field->getAttribute(key: 'control_type')) {
@@ -230,6 +253,10 @@ class VisualForms
         return $control;
     }
 
+    /**
+     * @deprecated
+     * TODO: Replace input field with component
+     */
     public function makeRules(VisualFormField $field): array
     {
         if (! ($field->getAttribute('validation_rules') && count($field->getAttribute('validation_rules')))) {
@@ -242,6 +269,10 @@ class VisualForms
         ) => [$rule['rule'] => $rule['rule'] ? "{$rule['rule']}:{$rule['value']}" : $rule['value']])->values()->toArray();
     }
 
+    /**
+     * @deprecated
+     * TODO: Replace $field with $component
+     */
     public function makeOptions(VisualFormField $field): Collection | array | null
     {
         if (! ControlTypes::hasOptions($field->getAttribute('control_type'))) {
@@ -344,6 +375,11 @@ class VisualForms
         ];
     }
 
+    /**
+     * @deprecated
+     *
+     * @return Models\VisualFormEntry|\Illuminate\Database\Eloquent\Model
+     */
     public function recordSubmission(VisualForm $record, array $data, bool $isProcessed = false)
     {
         return $record->entries()->create([
