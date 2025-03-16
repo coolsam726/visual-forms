@@ -26,7 +26,7 @@ class Section extends Component
     public function makeComponent(): \Filament\Forms\Components\Section
     {
         $record = $this->getRecord();
-        if (!$record) {
+        if (! $record) {
             throw new \Exception('Record not found');
         }
         $component = \Filament\Forms\Components\Section::make($record->getAttribute('label'));
@@ -65,10 +65,10 @@ class Section extends Component
                         IconSize::Small->value => __('Small'),
                         IconSize::Medium->value => __('Medium'),
                         IconSize::Large->value => __('Large'),
-                    ])->default(IconSize::Medium->value)->inline()->hidden(fn(Get $get) => !$get('icon')),
+                    ])->default(IconSize::Medium->value)->inline()->hidden(fn (Get $get) => ! $get('icon')),
                     \Filament\Forms\Components\Checkbox::make('collapsible')->label(__('Collapsible'))->live()->default(false),
                     \Filament\Forms\Components\Checkbox::make('collapsed')->label(__('Collapsed'))->live()->default(false)
-                        ->hidden(fn(Get $get) => !$get('collapsible')),
+                        ->hidden(fn (Get $get) => ! $get('collapsible')),
                     \Filament\Forms\Components\Checkbox::make('disabled')->label(__('Disabled'))->default(false),
                 ])->columns([
                     'md' => 2, 'xl' => 4,
