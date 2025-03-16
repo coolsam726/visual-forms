@@ -35,7 +35,13 @@ class TextInput extends Component
         return $this->extendCommonSchema([
             \Filament\Forms\Components\Fieldset::make(__('Text Specific Properties'))
                 ->statePath('props')
-                ->schema(fn () => [])->columns(),
+                ->schema(fn () => [
+                    \Filament\Forms\Components\TextInput::make('placeholder')->label(__('Placeholder'))->autocapitalize(),
+                    \Filament\Forms\Components\TextInput::make('helper_text')->label(__('Helper Text')),
+                    \Filament\Forms\Components\TextInput::make('hint')->label(__('Hint')),
+                    \Filament\Forms\Components\Checkbox::make('autocapitalize')->label(__('Autocapitalize')),
+                    \Filament\Forms\Components\Checkbox::make('autocomplete')->label(__('Autocomplete')),
+                ])->columns(3),
         ]);
     }
 
@@ -57,6 +63,7 @@ class TextInput extends Component
                 ->statePath('props')
                 ->schema([
                     \Filament\Forms\Components\Checkbox::make('required')->live()->default(true),
+                    \Filament\Forms\Components\Checkbox::make('unique')->live()->default(false),
                     \Filament\Forms\Components\Checkbox::make('readOnly')->label(__('Read Only'))->live()->default(false),
                     \Filament\Forms\Components\Checkbox::make('disabled')->label(__('Disabled'))->live()->default(false),
                     \Filament\Forms\Components\Checkbox::make('email')->label(__('Email'))->live()->default(false),
@@ -353,6 +360,10 @@ class TextInput extends Component
 
         if ($props->get('same')) {
             $control->same($props->get('same'));
+        }
+
+        if ($props->get('unique')) {
+            $this->makeUnique($control);
         }
 
         return $control;

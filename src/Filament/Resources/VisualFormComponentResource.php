@@ -126,6 +126,7 @@ class VisualFormComponentResource extends Resource
                         Forms\Get $get
                     ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
             ])
+                ->startOnStep(fn ($record) => $record ? 2 : 1)
                 ->extraAttributes(['class' => 'fi-fo-wizard-vertical'])
                 ->columnSpanFull(),
         ];

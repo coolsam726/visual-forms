@@ -11,6 +11,7 @@ use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Support\Collection;
+use Illuminate\Validation\Rule;
 
 abstract class Component
 {
@@ -22,19 +23,9 @@ abstract class Component
 
     abstract public function hasChildren(): bool;
 
-    public function getProps(): array
+    public function getProps(): Collection
     {
-        $component = $this->record;
-        $supported = $this->getSupportedProps();
-        $props = [];
-        if ($component) {
-            $componentProps = collect($component->getAttribute('props'));
-            foreach ($supported as $prop) {
-                $props[$prop] = $componentProps->get($prop);
-            }
-        }
-
-        return $props;
+        return collect($this->getRecord()->getAttribute('props'));
     }
 
     public function getRecord(): ?VisualFormComponent
@@ -352,5 +343,24 @@ abstract class Component
         } else {
             return [];
         }
+    }
+
+    public function makeUnique(mixed &$component): mixed
+    {
+        if (! $this->getRecord()) {
+            return $component;
+        }
+        if ($this->isLayout()) {
+            return $component;
+        }
+
+        if ($this->getProps()->get('unique')) {
+            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $this->getRecord()->getAttribute('name'));
+            if ($this->getRecord()->getAttribute('id')) {
+                $rule = $rule->ignore($this->getRecord()->getAttribute('id'));
+            }
+            $component->rule($rule);
+        }
+        return $component;
     }
 }
