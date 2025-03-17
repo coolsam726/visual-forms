@@ -39,6 +39,19 @@ class TextInput extends Component
                     \Filament\Forms\Components\TextInput::make('placeholder')->label(__('Placeholder'))->autocapitalize(),
                     \Filament\Forms\Components\TextInput::make('helper_text')->label(__('Helper Text')),
                     \Filament\Forms\Components\TextInput::make('hint')->label(__('Hint')),
+                    \Filament\Forms\Components\Select::make('prefixIcon')->live()->label(__('Prefix Icon'))
+                        ->options(Utils::getHeroicons())->searchable()->placeholder(__('Select an Icon')),
+                    \Filament\Forms\Components\Select::make('suffixIcon')->live()->label(__('Suffix Icon'))
+                        ->options(Utils::getHeroicons())->searchable()->placeholder(__('Select an Icon')),
+                    \Filament\Forms\Components\Select::make('prefixIconColor')->label(__('Prefix Icon Color'))
+                        ->live()->visible(fn ($get) => $get('prefixIcon'))->options(Utils::getAppColors()),
+                    \Filament\Forms\Components\Select::make('suffixIconColor')->label(__('Suffix Icon Color'))
+                        ->live()->visible(fn ($get) => $get('suffixIcon'))
+                        ->options(Utils::getAppColors()),
+                    \Filament\Forms\Components\TextInput::make('prefix')->visible(fn ($get) => ! $get('prefixIcon'))->label(__('Prefix')),
+                    \Filament\Forms\Components\TextInput::make('suffix')->label(__('Suffix'))->visible(fn ($get) => ! $get('suffixIcon')),
+                    \Filament\Forms\Components\Checkbox::make('inlinePrefix')->label(__('Inline Prefix'))->default(false),
+                    \Filament\Forms\Components\Checkbox::make('inlineSuffix')->label(__('Inline Suffix'))->default(false),
                     \Filament\Forms\Components\Checkbox::make('autocapitalize')->label(__('Autocapitalize')),
                     \Filament\Forms\Components\Checkbox::make('autocomplete')->label(__('Autocomplete')),
                 ])->columns(3),
@@ -241,37 +254,7 @@ class TextInput extends Component
             $control->readOnly(Utils::getBool($props->get('readOnly')));
         }
 
-        if ($props->get('prefix')) {
-            $control->prefix($props->get('prefix'));
-        }
-
-        if ($props->get('suffix')) {
-            $control->suffix($props->get('suffix'));
-        }
-
-        if ($props->get('prefixIcon')) {
-            $control->prefixIcon($props->get('prefixIcon'));
-        }
-
-        if ($props->get('suffixIcon')) {
-            $control->suffixIcon($props->get('suffixIcon'));
-        }
-
-        if ($props->has('inlinePrefix')) {
-            $control->inlinePrefix(Utils::getBool($props->get('inlinePrefix')));
-        }
-
-        if ($props->has('inlineSuffix')) {
-            $control->inlineSuffix(Utils::getBool($props->get('inlineSuffix')));
-        }
-
-        if ($props->get('prefixIconColor')) {
-            $control->prefixIconColor($props->get('prefixIconColor'));
-        }
-
-        if ($props->get('suffixIconColor')) {
-            $control->suffixIconColor($props->get('suffixIconColor'));
-        }
+        $this->makeAffixes($control);
 
         if ($props->get('datalist')) {
             $control->datalist(collect($props->get('datalist'))->toArray());
