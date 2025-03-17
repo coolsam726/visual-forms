@@ -379,4 +379,44 @@ abstract class Component
 
         return $component;
     }
+
+    public function makeAffixes(mixed &$component): mixed
+    {
+        if (! $this->getRecord()) {
+            return $component;
+        }
+
+        if ($this->isLayout()) {
+            return $component;
+        }
+
+        $props = $this->getProps();
+        if ($props->get('prefixIcon')) {
+            $component->prefixIcon($props->get('prefixIcon'));
+            if ($props->get('prefixIconColor')) {
+                $component->prefixIconColor($props->get('prefixIconColor'));
+            }
+        } elseif ($props->get('prefix')) {
+            $component->prefix($props->get('prefix'));
+        }
+
+        if ($props->get('suffixIcon')) {
+            $component->suffixIcon($props->get('suffixIcon'));
+            if ($props->get('suffixIconColor')) {
+                $component->suffixIconColor($props->get('suffixIconColor'));
+            }
+        } elseif ($props->get('suffix')) {
+            $component->suffix($props->get('suffix'));
+        }
+
+        if ($props->get('inlineSuffix')) {
+            $component->inlineSuffix(Utils::getBool($props->get('inlineSuffix')));
+        }
+
+        if ($props->get('inlinePrefix')) {
+            $component->inlinePrefix(Utils::getBool($props->get('inlinePrefix')));
+        }
+
+        return $component;
+    }
 }
