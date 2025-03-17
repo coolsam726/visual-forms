@@ -61,30 +61,33 @@ abstract class Component
                             'label',
                             str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
                         );
-                        $set('column_span', [
-                            ['key' => 'default', 'value' => 1],
-                            ['key' => 'sm', 'value' => null],
-                            ['key' => 'md', 'value' => null],
-                            ['key' => 'lg', 'value' => null],
-                            ['key' => 'xl', 'value' => null],
-                            ['key' => '2xl', 'value' => null],
-                        ]);
-                        $set('columns', [
-                            ['key' => 'default', 'value' => 2],
-                            ['key' => 'sm', 'value' => null],
-                            ['key' => 'md', 'value' => null],
-                            ['key' => 'lg', 'value' => null],
-                            ['key' => 'xl', 'value' => null],
-                            ['key' => '2xl', 'value' => null],
-                        ]);
-                        $set('column_start', [
-                            ['key' => 'default', 'value' => 1],
-                            ['key' => 'sm', 'value' => null],
-                            ['key' => 'md', 'value' => null],
-                            ['key' => 'lg', 'value' => null],
-                            ['key' => 'xl', 'value' => null],
-                            ['key' => '2xl', 'value' => null],
-                        ]);
+                        if (!$this->getRecord()) {
+                            $set('column_span_full', false);
+                            $set('column_span', [
+                                ['key' => 'default', 'value' => 1],
+                                ['key' => 'sm', 'value' => null],
+                                ['key' => 'md', 'value' => null],
+                                ['key' => 'lg', 'value' => null],
+                                ['key' => 'xl', 'value' => null],
+                                ['key' => '2xl', 'value' => null],
+                            ]);
+                            $set('columns', [
+                                ['key' => 'default', 'value' => null],
+                                ['key' => 'sm', 'value' => 1],
+                                ['key' => 'md', 'value' => 2],
+                                ['key' => 'lg', 'value' => null],
+                                ['key' => 'xl', 'value' => 4],
+                                ['key' => '2xl', 'value' => null],
+                            ]);
+                            $set('column_start', [
+                                ['key' => 'default', 'value' => null],
+                                ['key' => 'sm', 'value' => null],
+                                ['key' => 'md', 'value' => null],
+                                ['key' => 'lg', 'value' => null],
+                                ['key' => 'xl', 'value' => null],
+                                ['key' => '2xl', 'value' => null],
+                            ]);
+                        }
                     }),
                 \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
                     ->required(fn (Get $get) => $get('first_name') !== null)
@@ -190,7 +193,6 @@ abstract class Component
                                 '2xl' => __('2x Extra Large'),
                             ]),
                         \Filament\Forms\Components\TextInput::make('value')
-                            ->default(1)
                             ->integer()
                             ->type('number')
                             ->minValue(1)

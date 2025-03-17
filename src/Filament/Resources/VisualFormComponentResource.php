@@ -104,7 +104,7 @@ class VisualFormComponentResource extends Resource
     {
         return [
             Forms\Components\Wizard::make([
-                Forms\Components\Wizard\Step::make(__('Step 1: Component Type'))->schema([
+                Forms\Components\Wizard\Step::make(__('Step 1: Component Type'))->lazy()->schema([
                     Forms\Components\Select::make('component_type')
                         ->required()
                         ->live()
@@ -112,14 +112,17 @@ class VisualFormComponentResource extends Resource
                         ->options(VisualForms::getComponentTypeOptions()),
                 ]),
                 Forms\Components\Wizard\Step::make(__('Step 2: Component Details'))
+                    ->lazy()
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getMainSchema()),
                 Forms\Components\Wizard\Step::make(__('Step 3: Configure Columns'))
+                    ->lazy()
                     ->schema(
                         fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getColumnsSchema()
                     ),
                 Forms\Components\Wizard\Step::make(__('Step 4: Validation Rules'))
+                    ->lazy()
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getValidationSchema())
                     ->visible(fn (
