@@ -61,7 +61,7 @@ abstract class Component
                             'label',
                             str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
                         );
-                        if (!$this->getRecord()) {
+                        if (! $this->getRecord()) {
                             $set('column_span_full', false);
                             $set('column_span', [
                                 ['key' => 'default', 'value' => 1],
