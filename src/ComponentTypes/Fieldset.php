@@ -33,6 +33,7 @@ class Fieldset extends Component
             $component->disabled(Utils::getBool($this->getProps()->get('disabled')));
         }
         $component->schema($this->makeChildren());
+
         return $component;
     }
 
