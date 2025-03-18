@@ -4,6 +4,7 @@ namespace Coolsam\VisualForms\ComponentTypes;
 
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
+use Coolsam\VisualForms\Concerns\HasOptions;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
@@ -15,7 +16,10 @@ use Illuminate\Validation\Rule;
 
 abstract class Component
 {
-    public function __construct(private readonly ?VisualFormComponent $record = null) {}
+    public function __construct(private readonly ?VisualFormComponent $record = null)
+    {
+        // Check if it has the HasOptions trait
+    }
 
     abstract public function getOptionName(): string;
 
@@ -328,7 +332,7 @@ abstract class Component
         return $control;
     }
 
-    public function makeValidation($component): void
+    public function makeValidation(&$component): void
     {
         if (! $this->getRecord()) {
             return;
@@ -420,5 +424,10 @@ abstract class Component
         }
 
         return $component;
+    }
+
+    public function hasOptions(): bool
+    {
+        return Utils::classHasTrait($this, HasOptions::class);
     }
 }

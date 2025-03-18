@@ -873,4 +873,9 @@ class Utils
             'gray' => 'Gray',
         ];
     }
+
+    public static function classHasTrait(object | string $classInstance, string $trait): bool
+    {
+        return in_array($trait, class_uses_recursive($classInstance));
+    }
 }
