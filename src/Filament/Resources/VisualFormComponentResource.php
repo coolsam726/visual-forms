@@ -111,17 +111,22 @@ class VisualFormComponentResource extends Resource
                         ->searchable()
                         ->options(VisualForms::getComponentTypeOptions()),
                 ]),
-                Forms\Components\Wizard\Step::make(__('Step 2: Component Details'))
+                Forms\Components\Wizard\Step::make(__('Component Details'))
                     ->lazy()
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getMainSchema()),
-                Forms\Components\Wizard\Step::make(__('Step 3: Configure Columns'))
+                Forms\Components\Wizard\Step::make(__('Configure Options'))
+                    ->lazy()
+                    ->visible(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions())
+                    ->schema(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions() ?
+                    Utils::instantiateClass($get('component_type'))->extendOptionsSchema() : []),
+                Forms\Components\Wizard\Step::make(__('Configure Columns'))
                     ->lazy()
                     ->schema(
                         fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getColumnsSchema()
                     ),
-                Forms\Components\Wizard\Step::make(__('Step 4: Validation Rules'))
+                Forms\Components\Wizard\Step::make(__('Validation Rules'))
                     ->lazy()
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getValidationSchema())

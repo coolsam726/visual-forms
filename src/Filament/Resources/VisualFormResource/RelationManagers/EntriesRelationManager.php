@@ -42,7 +42,7 @@ class EntriesRelationManager extends RelationManager
                 Infolists\Components\KeyValueEntry::make('payload')->label(__('Payload'))
                     ->extraAttributes(['class' => 'prose max-w-none'])
                     ->getStateUsing(fn ($record) => collect($record->payload)
-                        ->mapWithKeys(fn ($value, $key) => [$key => new HtmlString($value)]))->columnSpanFull(),
+                        ->mapWithKeys(fn ($value, $key) => [$key => new HtmlString(is_array($value) ? json_encode($value) : $value)]))->columnSpanFull(),
                 Infolists\Components\TextEntry::make('created_at')->label(__('Created At'))->dateTime(),
                 Infolists\Components\TextEntry::make('updated_at')->label(__('Updated At'))->dateTime(),
             ]);
