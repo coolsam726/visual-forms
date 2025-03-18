@@ -79,8 +79,6 @@ class CheckboxList extends Component
             $component->inlineLabel();
         }
 
-
-
         $this->makeValidation($component);
 
         return $component;

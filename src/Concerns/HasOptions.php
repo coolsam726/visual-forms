@@ -146,6 +146,7 @@ trait HasOptions
                 return collect($data)->mapWithKeys(fn ($item) => [$item[$valueField] => $item[$labelField]]);
             } catch (\Exception $e) {
                 \Log::error($e);
+
                 return collect();
             }
         } else {
