@@ -402,7 +402,8 @@ abstract class Component
             if ($props->get('prefixIconColor')) {
                 $component->prefixIconColor($props->get('prefixIconColor'));
             }
-        } elseif ($props->get('prefix')) {
+        }
+        if ($props->get('prefix')) {
             $component->prefix($props->get('prefix'));
         }
 
@@ -411,7 +412,9 @@ abstract class Component
             if ($props->get('suffixIconColor')) {
                 $component->suffixIconColor($props->get('suffixIconColor'));
             }
-        } elseif ($props->get('suffix')) {
+        }
+
+        if ($props->get('suffix')) {
             $component->suffix($props->get('suffix'));
         }
 
@@ -429,5 +432,25 @@ abstract class Component
     public function hasOptions(): bool
     {
         return Utils::classHasTrait($this, HasOptions::class);
+    }
+
+    protected function affixesSchema(): array
+    {
+        return [
+            \Filament\Forms\Components\Fieldset::make(__('Affixes'))->statePath('props')->columnSpanFull()->schema([
+                \Filament\Forms\Components\TextInput::make('prefix')->label(__('Prefix'))->live(debounce: 1000),
+                \Filament\Forms\Components\TextInput::make('suffix')->label(__('Suffix'))->live(debounce: 1000),
+                \Filament\Forms\Components\Select::make('prefixIcon')->label(__('Prefix Icon'))->options(Utils::getHeroicons())->searchable(),
+                \Filament\Forms\Components\Select::make('suffixIcon')->label(__('Suffix Icon'))->options(Utils::getHeroicons())->searchable(),
+                \Filament\Forms\Components\Select::make('prefixIconColor')->label(__('Prefix Icon Color'))
+                    ->live()->visible(fn ($get) => $get('prefixIcon'))->options(Utils::getAppColors()),
+                \Filament\Forms\Components\Select::make('suffixIconColor')->label(__('Suffix Icon Color'))
+                    ->live()->visible(fn ($get) => $get('suffixIcon'))
+                    ->options(Utils::getAppColors()),
+
+                \Filament\Forms\Components\Checkbox::make('inlinePrefix')->label(__('Inline Prefix'))->default(false),
+                \Filament\Forms\Components\Checkbox::make('inlineSuffix')->label(__('Inline Suffix'))->default(false),
+            ]),
+        ];
     }
 }

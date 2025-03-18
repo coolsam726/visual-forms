@@ -32,17 +32,27 @@ class CheckboxList extends Component
         }
 
         $component = \Filament\Forms\Components\CheckboxList::make($record->getAttribute('name'));
+
+        $this->configureComponent($component);
+
+        return $component;
+    }
+
+    protected function configureComponent(&$component): void
+    {
+        $record = $this->getRecord();
         if ($record->getAttribute('label')) {
             $component->label($record->getAttribute('label'));
-        }
-        if ($record->getAttribute('helperText')) {
-            $component->helperText($record->getAttribute('helperText'));
         }
         $this->makeColumns($component);
         $this->makeUnique($component);
         $this->makeOptions($component);
 
         $props = $this->getProps();
+
+        if ($helper = $props->get('helperText')) {
+            $component->helperText($helper);
+        }
 
         if ($props->get('hint')) {
             $component->hint($props->get('hint'));
@@ -80,14 +90,12 @@ class CheckboxList extends Component
         }
 
         $this->makeValidation($component);
-
-        return $component;
     }
 
     public function getMainSchema(): array
     {
         return $this->extendCommonSchema([
-            \Filament\Forms\Components\Fieldset::make(__('Checkbox List Properties'))
+            \Filament\Forms\Components\Fieldset::make(__($this->getOptionName() . ' Properties'))
                 ->columns([
                     'md' => 2,
                     'xl' => 3,
@@ -98,21 +106,14 @@ class CheckboxList extends Component
                     \Filament\Forms\Components\TextInput::make('hint')->live(debounce: 1000)
                         ->label(__('Hint')),
                     \Filament\Forms\Components\Select::make('hintIcon')->label(__('Hint icon'))->options(Utils::getHeroicons())->searchable(),
-                    \Filament\Forms\Components\ToggleButtons::make('default')
-                        ->inline()
+                    \Filament\Forms\Components\TextInput::make('default')
                         ->live()
                         ->label(__('Default State'))
-                        ->default(false)
-                        ->options([
-                            null => __('None'),
-                            true => __('True'),
-                            false => __('False'),
-                        ]),
+                        ->default(false),
                     \Filament\Forms\Components\Checkbox::make('disabled')->label(__('Disabled'))->default(false),
                     \Filament\Forms\Components\Checkbox::make('inlineLabel')->label(__('Inline Label'))->live()->hidden(fn ($get) => $get('inline'))->default(false),
                     \Filament\Forms\Components\Checkbox::make('searchable')->label(__('Searchable'))->default(true),
                 ]),
-
         ]);
     }
 
