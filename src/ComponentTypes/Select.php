@@ -33,6 +33,7 @@ class Select extends CheckboxList
     public function getMainSchema(): array
     {
         $schema = parent::getMainSchema();
+
         return array_merge($schema, $this->affixesSchema());
     }
 }
