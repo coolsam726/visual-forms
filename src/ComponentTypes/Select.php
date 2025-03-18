@@ -2,40 +2,38 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class Select extends Component
+class Select extends CheckboxList
 {
     public function getOptionName(): string
     {
         return __('Select');
     }
 
-    public function isLayout(): bool
+    /**
+     * @throws \Exception
+     */
+    public function makeComponent(): \Filament\Forms\Components\Select
     {
-        return true;
+        $record = $this->getRecord();
+        if (! $record) {
+            throw new \Exception('Record not found');
+        }
+        $component = \Filament\Forms\Components\Select::make($record->getAttribute('name'));
+        $this->configureComponent($component);
+
+        return $component;
     }
 
-    public function hasChildren(): bool
+    protected function configureComponent(&$component): void
     {
-        return true;
-    }
-
-    public function makeComponent(): array
-    {
-        return [];
+        parent::configureComponent($component);
+        $this->makeAffixes($component);
     }
 
     public function getMainSchema(): array
     {
-        return $this->extendCommonSchema([]);
-    }
+        $schema = parent::getMainSchema();
 
-    public function getValidationSchema(): array
-    {
-        return [];
-    }
-
-    public function getColumnsSchema(): array
-    {
-        return $this->extendColumnsSchema();
+        return array_merge($schema, $this->affixesSchema());
     }
 }

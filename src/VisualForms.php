@@ -35,7 +35,7 @@ class VisualForms
 
         return collect($files)
             ->map(fn (SplFileInfo $file) => Utils::getFileNamespace($file, 'Coolsam\VisualForms\ComponentTypes'))
-            ->filter(fn ($class) => is_subclass_of($class, Component::class))
+            ->filter(fn ($class): bool => is_subclass_of($class, Component::class))
             ->mapWithKeys(fn (string $class) => [
                 $class => class_exists($class) ? (new $class)->getOptionName() : str($class)->afterLast('\\')->camel()->snake()->title()->explode('_')->join(' '),
             ]);
