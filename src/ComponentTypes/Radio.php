@@ -12,7 +12,7 @@ class Radio extends CheckboxList
     /**
      * @throws \Exception
      */
-    public function makeComponent(): \Filament\Forms\Components\Radio
+    public function makeComponent()
     {
         if (! $record = $this->getRecord()) {
             throw new \Exception('Record not found');
