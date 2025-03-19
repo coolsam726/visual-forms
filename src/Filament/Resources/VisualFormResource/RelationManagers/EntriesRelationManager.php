@@ -2,7 +2,7 @@
 
 namespace Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers;
 
-use Filament\Forms;
+use Coolsam\VisualForms\Models\VisualFormEntry;
 use Filament\Forms\Form;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
@@ -24,11 +24,10 @@ class EntriesRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Forms\Components\TextInput::make('id')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+            ->statePath('payload')
+            ->schema(fn (
+                VisualFormEntry $record
+            ) => $record?->getAttribute('id') ? $record->getAttribute('parent')->schema() : []);
     }
 
     public function infolist(Infolist $infolist): Infolist
@@ -42,7 +41,10 @@ class EntriesRelationManager extends RelationManager
                 Infolists\Components\KeyValueEntry::make('payload')->label(__('Payload'))
                     ->extraAttributes(['class' => 'prose max-w-none'])
                     ->getStateUsing(fn ($record) => collect($record->payload)
-                        ->mapWithKeys(fn ($value, $key) => [$key => new HtmlString(is_array($value) ? json_encode($value) : $value)]))->columnSpanFull(),
+                        ->mapWithKeys(fn (
+                            $value,
+                            $key
+                        ) => [$key => new HtmlString(is_array($value) ? json_encode($value) : $value)]))->columnSpanFull(),
                 Infolists\Components\TextEntry::make('created_at')->label(__('Created At'))->dateTime(),
                 Infolists\Components\TextEntry::make('updated_at')->label(__('Updated At'))->dateTime(),
             ]);
@@ -66,7 +68,8 @@ class EntriesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                Tables\Actions\Action::make('refresh')->label(__('Refresh'))->action(fn () => $this->dispatch('refresh')),
+                Tables\Actions\Action::make('refresh')->label(__('Refresh'))->action(fn (
+                ) => $this->dispatch('refresh')),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
