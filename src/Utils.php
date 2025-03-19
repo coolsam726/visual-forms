@@ -891,6 +891,7 @@ class Utils
             return $class->isLayout() || $class->hasChildren();
         })->mapWithKeys(function (VisualFormComponent $component) {
             $class = Utils::instantiateClass($component->getAttribute('component_type'));
+
             return [$component->getAttribute('id') => "{$component->getAttribute('label')} ({$class->getOptionName()})"];
         });
     }
