@@ -2,6 +2,7 @@
 
 namespace Coolsam\VisualForms;
 
+use Coolsam\VisualForms\Models\VisualFormComponent;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -877,5 +878,20 @@ class Utils
     public static function classHasTrait(object | string $classInstance, string $trait): bool
     {
         return in_array($trait, class_uses_recursive($classInstance));
+    }
+
+    public static function getEligibleParentComponents(): Collection
+    {
+        $all = VisualFormComponent::query()->where('is_active', '=', true)
+            ->get();
+
+        return $all->filter(function (VisualFormComponent $component) {
+            $class = Utils::instantiateClass($component->getAttribute('component_type'));
+
+            return $class->isLayout() || $class->hasChildren();
+        })->mapWithKeys(function (VisualFormComponent $component) {
+            $class = Utils::instantiateClass($component->getAttribute('component_type'));
+            return [$component->getAttribute('id') => "{$component->getAttribute('label')} ({$class->getOptionName()})"];
+        });
     }
 }

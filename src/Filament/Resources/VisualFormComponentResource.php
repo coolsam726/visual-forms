@@ -86,8 +86,8 @@ class VisualFormComponentResource extends Resource
     {
         $details = [];
 
-        if ($record->visualForm) {
-            $details['VisualForm'] = $record->visualForm->name;
+        if ($visualForm = $record->getAttribute('visualForm')) {
+            $details['VisualForm'] = $visualForm->getAttribute('name');
         }
 
         return $details;
@@ -110,6 +110,10 @@ class VisualFormComponentResource extends Resource
                         ->live()
                         ->searchable()
                         ->options(VisualForms::getComponentTypeOptions()),
+                    Forms\Components\Select::make('parent_id')->label(__('Parent Component'))
+                        ->live()
+                        ->searchable()
+                        ->options(Utils::getEligibleParentComponents()->toArray()),
                 ]),
                 Forms\Components\Wizard\Step::make(__('Component Details'))
                     ->lazy()
