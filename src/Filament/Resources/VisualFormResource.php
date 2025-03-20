@@ -109,7 +109,7 @@ class VisualFormResource extends Resource
     {
         return [
             Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
-//            Resources\VisualFormResource\RelationManagers\FieldsRelationManager::class,
+            //            Resources\VisualFormResource\RelationManagers\FieldsRelationManager::class,
             Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
         ];
     }
