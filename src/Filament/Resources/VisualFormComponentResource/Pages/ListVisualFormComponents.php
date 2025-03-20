@@ -13,7 +13,6 @@ class ListVisualFormComponents extends ListRecords
         return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
     }
 
-
     protected function getHeaderActions(): array
     {
         return [
