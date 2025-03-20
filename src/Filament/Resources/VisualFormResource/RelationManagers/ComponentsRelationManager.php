@@ -40,8 +40,10 @@ class ComponentsRelationManager extends RelationManager
     public static function canViewForRecord(Model | VisualForm | VisualFormComponent $ownerRecord, string $pageClass): bool
     {
         return (parent::canViewForRecord($ownerRecord, $pageClass)
-                && (is_subclass_of($ownerRecord, \Config::get('visual-forms.models.visual_form')
-        ))) || (is_subclass_of($ownerRecord, \Config::get('visual-forms.models.visual_form_component')) && Utils::instantiateClass($ownerRecord->getAttribute('component_type'))->hasChildren());
+                && (is_subclass_of(
+                    $ownerRecord,
+                    \Config::get('visual-forms.models.visual_form')
+                ))) || (is_subclass_of($ownerRecord, \Config::get('visual-forms.models.visual_form_component')) && Utils::instantiateClass($ownerRecord->getAttribute('component_type'))->hasChildren());
     }
 
     public function form(Form $form): Form
