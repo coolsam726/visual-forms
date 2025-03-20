@@ -47,7 +47,8 @@ class CheckboxList extends Component
         $this->makeColumns($component);
         $this->makeUnique($component);
         $this->makeOptions($component);
-
+        $this->makeStatePath($component);
+        
         $props = $this->getProps();
 
         if ($helper = $props->get('helperText')) {
