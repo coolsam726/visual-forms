@@ -36,11 +36,15 @@ class EditVisualFormComponent extends EditRecord
             Action::make('parent-form')->label(__('Parent Form'))
                 ->icon('heroicon-o-arrow-turn-left-up')
                 ->color('success')
-                ->url(fn (VisualFormComponent $record) => VisualFormResource::getUrl('edit', ['record' => $record->getAttribute('form_id')])),
+                ->url(fn (VisualFormComponent $record) => (
+                    \Config::get('visual-forms.resources.visual-form', VisualFormResource::class)
+                )::getUrl('edit', ['record' => $record->getAttribute('form_id')])),
             Action::make('parent')->label(__('Parent Component'))
                 ->visible(fn (VisualFormComponent $record) => $record->getAttribute('parent_id') !== null)
                 ->icon('heroicon-o-arrow-left')
-                ->url(fn (VisualFormComponent $record) => VisualFormComponentResource::getUrl('edit', ['record' => $record->getAttribute('parent_id')])),
+                ->url(fn (VisualFormComponent $record) => (
+                    \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class)
+                )::getUrl('edit', ['record' => $record->getAttribute('parent_id')])),
             DeleteAction::make(),
         ];
     }
