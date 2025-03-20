@@ -36,6 +36,7 @@ class Section extends Component
         }
 
         $this->makeColumns($component);
+        $this->makeStatePath($component);
         $props = $this->getProps();
         if ($props->isNotEmpty()) {
             if ($props->get('icon')) {

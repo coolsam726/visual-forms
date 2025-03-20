@@ -346,6 +346,16 @@ abstract class Component
         }
     }
 
+    protected function makeStatePath(&$component): void
+    {
+        $record = $this->getRecord();
+        if ($record->getAttribute('state_path')) {
+            if (method_exists($component, 'statePath')) {
+                $component->statePath($record->getAttribute('state_path'));
+            }
+        }
+    }
+
     protected function makeChildren(): array
     {
         $record = $this->getRecord();

@@ -208,6 +208,7 @@ class TextInput extends Component
         }
 
         $this->makeColumns($control);
+        $this->makeStatePath($component);
         $this->makeValidation($control);
         $props = collect($record->getAttribute('props') ?? []);
         if ($props->isEmpty()) {
