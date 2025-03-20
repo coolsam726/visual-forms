@@ -60,11 +60,15 @@ abstract class Component
                     ->hint(__('e.g first_name'))
                     ->required()
                     ->live(debounce: 500)
-                    ->afterStateUpdated(function ($state, Set $set) {
+                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
                         $set(
                             'label',
                             str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
                         );
+                        $class = Utils::instantiateClass($get('component_type'));
+                        if ($class && ! ($class->isLayout())) {
+                            $set('state_path', $get('name'));
+                        }
                         if (! $this->getRecord()) {
                             $set('column_span_full', false);
                             $set('column_span', [
@@ -97,8 +101,8 @@ abstract class Component
                     ->required(fn (Get $get) => $get('first_name') !== null)
                     ->hint(__('e.g First Name')),
                 \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
-                    ->hint(__('e.g users'))
-                    ->helperText(__('Leave blank to use the default state path'))
+                    ->hint(__('e.g biodata.first_name'))
+                    ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
                     ->live(debounce: 500),
                 \Filament\Forms\Components\Textarea::make('description')->columnSpanFull()->label(__('Description'))->default(''),
                 \Filament\Forms\Components\Checkbox::make('is_active')->default(true),
