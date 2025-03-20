@@ -13,7 +13,10 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class EditVisualFormComponent extends EditRecord
 {
-    protected static string $resource = VisualFormComponentResource::class;
+    public static function getResource(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+    }
 
     public function getHeading(): string | Htmlable
     {

@@ -21,13 +21,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class VisualFormComponentResource extends Resource
 {
-    protected static ?string $model = VisualFormComponent::class;
-
     protected static ?string $slug = 'visual-form-components';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static bool $shouldRegisterNavigation = false;
+
+    public static function getModel(): string
+    {
+        return \Config::get('visual-forms.models.visual_form_component', VisualFormComponent::class);
+    }
 
     public static function form(Form $form): Form
     {
