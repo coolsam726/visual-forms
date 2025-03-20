@@ -116,6 +116,7 @@ class VisualFormComponentResource extends Resource
                     Forms\Components\Select::make('parent_id')->label(__('Parent Component'))
                         ->live()
                         ->searchable()
+                        ->visible(fn ($record) => (bool) $record?->getAttribute('id'))
                         ->options(Utils::getEligibleParentComponents()->toArray()),
                 ]),
                 Forms\Components\Wizard\Step::make(__('Component Details'))
