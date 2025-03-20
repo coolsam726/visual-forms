@@ -78,6 +78,7 @@ class ComponentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()->mutateFormDataUsing(function (array $data) {
+
                     if ($this->ownerRecord instanceof VisualFormComponent) {
                         $data['form_id'] = $this->ownerRecord->getAttribute('form_id');
                     }
