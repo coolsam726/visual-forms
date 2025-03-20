@@ -14,4 +14,8 @@ return [
         'visual_form_component' => \Coolsam\VisualForms\Models\VisualFormComponent::class,
         'visual_form_entry' => \Coolsam\VisualForms\Models\VisualFormEntry::class,
     ],
+    'resources' => [
+        'visual-form' => \Coolsam\VisualForms\Filament\Resources\VisualFormResource::class,
+        'visual-form-component' => \Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource::class,
+    ],
 ];

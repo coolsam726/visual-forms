@@ -12,7 +12,12 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditVisualForm extends EditRecord
 {
-    protected static string $resource = VisualFormResource::class;
+
+    public static function getResource(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form', VisualFormResource::class);
+    }
+
 
     protected function getHeaderActions(): array
     {

@@ -17,6 +17,11 @@ class ComponentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'children';
 
+    public static function getResource()
+    {
+        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+    }
+
     protected function configureCreateAction(Tables\Actions\CreateAction $action): void
     {
         parent::configureCreateAction($action);
@@ -34,7 +39,9 @@ class ComponentsRelationManager extends RelationManager
 
     public static function canViewForRecord(Model | VisualForm | VisualFormComponent $ownerRecord, string $pageClass): bool
     {
-        return parent::canViewForRecord($ownerRecord, $pageClass) && ($ownerRecord instanceof VisualForm || ($ownerRecord instanceof VisualFormComponent && Utils::instantiateClass($ownerRecord->component_type)->hasChildren()));
+        return (parent::canViewForRecord($ownerRecord, $pageClass)
+                && (is_subclass_of($ownerRecord, \Config::get('visual-forms.models.visual_form')
+        ))) || (is_subclass_of($ownerRecord, \Config::get('visual-forms.models.visual_form_component')) && Utils::instantiateClass($ownerRecord->getAttribute('component_type'))->hasChildren());
     }
 
     public function form(Form $form): Form
@@ -80,7 +87,7 @@ class ComponentsRelationManager extends RelationManager
                 Tables\Actions\Action::make('manage')->label(__('Manage'))
                     ->icon('heroicon-o-chevron-double-right')
                     ->color('success')
-                    ->url(fn (VisualFormComponent $record) => VisualFormComponentResource::getUrl('edit', ['record' => $record->getKey()])),
+                    ->url(fn (VisualFormComponent $record) => (static::getResource())::getUrl('edit', ['record' => $record->getKey()])),
                 Tables\Actions\EditAction::make()->color('warning'),
                 Tables\Actions\DeleteAction::make(),
             ])

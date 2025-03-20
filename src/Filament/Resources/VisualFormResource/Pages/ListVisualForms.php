@@ -8,7 +8,11 @@ use Filament\Resources\Pages\ListRecords;
 
 class ListVisualForms extends ListRecords
 {
-    protected static string $resource = VisualFormResource::class;
+    public static function getResource(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form', VisualFormResource::class);
+    }
+
 
     protected function getHeaderActions(): array
     {

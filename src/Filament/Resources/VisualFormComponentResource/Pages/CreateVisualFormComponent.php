@@ -7,7 +7,10 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateVisualFormComponent extends CreateRecord
 {
-    protected static string $resource = VisualFormComponentResource::class;
+    public static function getResource(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+    }
 
     protected function getHeaderActions(): array
     {
