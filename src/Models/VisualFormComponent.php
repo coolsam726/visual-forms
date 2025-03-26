@@ -50,4 +50,11 @@ class VisualFormComponent extends Model
 
         return Utils::instantiateClass($class, ['record' => $this])->makeComponent($editable);
     }
+
+    public function createChild(array $data)
+    {
+        $data['form_id'] = $this->getAttribute('form_id');
+
+        return $this->children()->create($data);
+    }
 }

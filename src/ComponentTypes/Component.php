@@ -484,7 +484,25 @@ abstract class Component
     {
         $record = $this->getRecord();
 
-        $editAction = Action::make('edit_field')->label('Edit Field')
+        $createAction = Action::make('create_field')->label(__('Add a Component'))
+            ->icon('heroicon-o-plus-circle')
+            ->iconButton()
+            ->color('success')
+            ->extraAttributes(['class' => 'static'])
+            ->form(fn (Form $form) => $form
+                ->model(VisualFormComponent::class)
+                ->schema(VisualFormComponentResource::getSchema()))
+            ->mountUsing(fn (ComponentContainer $form) => $form->fill([
+                'parent_id' => $record->getKey(),
+            ]))
+            ->action(function (array $data) use ($record) {
+                $data['form_id'] = $record->getKey();
+                $record->creatComponent($data);
+
+                return $record;
+            });
+
+        $editAction = Action::make('edit_field')->label(__('Edit Component'))
             ->icon('heroicon-o-pencil-square')
             ->iconButton()
             ->color('warning')
@@ -499,14 +517,23 @@ abstract class Component
                 $record->update($data);
             });
         if ($editable) {
+            $actions = [
+                $editAction,
+            ];
+            /**
+             * @var Component $componentType
+             */
+            $componentType = Utils::instantiateClass($record->getAttribute('component_type'));
+            if ($componentType->hasChildren()) {
+                $actions = [
+                    $createAction,
+                    $editAction,
+                ];
+            }
             if (method_exists($component, 'hintAction')) {
-                $component->hintActions([
-                    $editAction,
-                ]);
+                $component->hintActions($actions);
             } elseif (method_exists($component, 'headerActions')) {
-                $component->headerActions([
-                    $editAction,
-                ]);
+                $component->headerActions($actions);
             }
 
             if (method_exists($component, 'extraFieldWrapperAttributes')) {
@@ -515,10 +542,5 @@ abstract class Component
                 $component->extraAttributes(['class' => 'border-dashed border-primary border-2 border-gray-300 rounded-md p-2']);
             }
         }
-    }
-
-    public function openEditModal()
-    {
-        dd('open edit modal');
     }
 }

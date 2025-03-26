@@ -116,8 +116,12 @@ class VisualFormComponentResource extends Resource
                     Forms\Components\Select::make('parent_id')->label(__('Parent Component'))
                         ->live()
                         ->searchable()
-                        ->visible(fn ($record) => (bool) $record?->getAttribute('id'))
+                        ->visible(fn ($record, $state) => (bool) $record?->getAttribute('id') || $state)
                         ->options(Utils::getEligibleParentComponents()->toArray()),
+                    //                    Forms\Components\Fieldset::make(__('Order'))->schema([
+                    //                        Forms\Components\Select::make('sort_order')
+                    //                            ->label(__('Create After')),
+                    //                    ]),
                 ]),
                 Forms\Components\Tabs\Tab::make(__('Component Details'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
@@ -141,7 +145,7 @@ class VisualFormComponentResource extends Resource
                         Forms\Get $get
                     ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
             ])
-                ->activeTab(fn ($record) => $record ? 2 : 1)
+                ->activeTab(fn ($record) => $record?->id ? 2 : 1)
                 ->extraAttributes(['class' => 'fi-fo-wizard-vertical'])
                 ->columnSpanFull(),
         ];
