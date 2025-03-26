@@ -54,6 +54,7 @@ class VisualFormComponent extends Model
     public function createChild(array $data)
     {
         $data['form_id'] = $this->getAttribute('form_id');
+
         return $this->children()->create($data);
     }
 }

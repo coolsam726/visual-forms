@@ -5,7 +5,6 @@ namespace Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource\Pages;
 use Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers\ComponentsRelationManager;
-use Coolsam\VisualForms\Models\VisualForm;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
 use Filament\Forms;
@@ -119,10 +118,10 @@ class VisualFormComponentResource extends Resource
                         ->searchable()
                         ->visible(fn ($record, $state) => (bool) $record?->getAttribute('id') || $state)
                         ->options(Utils::getEligibleParentComponents()->toArray()),
-//                    Forms\Components\Fieldset::make(__('Order'))->schema([
-//                        Forms\Components\Select::make('sort_order')
-//                            ->label(__('Create After')),
-//                    ]),
+                    //                    Forms\Components\Fieldset::make(__('Order'))->schema([
+                    //                        Forms\Components\Select::make('sort_order')
+                    //                            ->label(__('Create After')),
+                    //                    ]),
                 ]),
                 Forms\Components\Tabs\Tab::make(__('Component Details'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :

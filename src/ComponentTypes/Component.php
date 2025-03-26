@@ -498,6 +498,7 @@ abstract class Component
             ->action(function (array $data) use ($record) {
                 $data['form_id'] = $record->getKey();
                 $record->creatComponent($data);
+
                 return $record;
             });
 
