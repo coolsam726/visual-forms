@@ -6,9 +6,13 @@ use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
 use Coolsam\VisualForms\Concerns\HasOptions;
 use Coolsam\VisualForms\Facades\VisualForms;
+use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
+use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Support\Collection;
@@ -37,7 +41,7 @@ abstract class Component
         return $this->record;
     }
 
-    abstract public function makeComponent();
+    abstract public function makeComponent(bool $editable = false);
 
     /**
      * You can pass in an array of Tabs or simply an array of Components together with the tab label if you prefer all components to be in a single tab.
@@ -55,59 +59,64 @@ abstract class Component
         }
 
         return [
-            \Filament\Forms\Components\Fieldset::make(__('Common Details'))->schema([
-                \Filament\Forms\Components\TextInput::make('name')->label(__('Name'))
-                    ->hint(__('e.g first_name'))
-                    ->required()
-                    ->live(debounce: 500)
-                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
-                        $set(
-                            'label',
-                            str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
-                        );
-                        $class = Utils::instantiateClass($get('component_type'));
-                        if ($class && ! ($class->isLayout())) {
-                            $set('state_path', $get('name'));
-                        }
-                        if (! $this->getRecord()) {
-                            $set('column_span_full', false);
-                            $set('column_span', [
-                                ['key' => 'default', 'value' => 1],
-                                ['key' => 'sm', 'value' => null],
-                                ['key' => 'md', 'value' => null],
-                                ['key' => 'lg', 'value' => null],
-                                ['key' => 'xl', 'value' => null],
-                                ['key' => '2xl', 'value' => null],
-                            ]);
-                            $set('columns', [
-                                ['key' => 'default', 'value' => null],
-                                ['key' => 'sm', 'value' => 1],
-                                ['key' => 'md', 'value' => 2],
-                                ['key' => 'lg', 'value' => null],
-                                ['key' => 'xl', 'value' => 4],
-                                ['key' => '2xl', 'value' => null],
-                            ]);
-                            $set('column_start', [
-                                ['key' => 'default', 'value' => null],
-                                ['key' => 'sm', 'value' => null],
-                                ['key' => 'md', 'value' => null],
-                                ['key' => 'lg', 'value' => null],
-                                ['key' => 'xl', 'value' => null],
-                                ['key' => '2xl', 'value' => null],
-                            ]);
-                        }
-                    }),
-                \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
-                    ->required(fn (Get $get) => $get('first_name') !== null)
-                    ->hint(__('e.g First Name')),
-                \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
-                    ->hint(__('e.g biodata.first_name'))
-                    ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
-                    ->live(debounce: 500),
-                \Filament\Forms\Components\Textarea::make('description')->columnSpanFull()->label(__('Description'))->default(''),
-                \Filament\Forms\Components\Checkbox::make('is_active')->default(true),
-            ]),
-            ...($isFieldsets ? $components : [\Filament\Forms\Components\Fieldset::make($fieldsetLabel ?? 'Specific Field Details')->schema($components)]),
+            \Filament\Forms\Components\Section::make(__('Common Details'))
+                ->collapsible()
+                ->schema([
+                    \Filament\Forms\Components\TextInput::make('name')->label(__('Name'))
+                        ->hint(__('e.g first_name'))
+                        ->required()
+                        ->live(debounce: 500)
+                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                            $set(
+                                'label',
+                                str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
+                            );
+                            $class = Utils::instantiateClass($get('component_type'));
+                            if ($class && ! ($class->isLayout())) {
+                                $set('state_path', $get('name'));
+                            }
+                            if (! $this->getRecord()) {
+                                $set('column_span_full', false);
+                                $set('column_span', [
+                                    ['key' => 'default', 'value' => 1],
+                                    ['key' => 'xs', 'value' => 1],
+                                    ['key' => 'sm', 'value' => null],
+                                    ['key' => 'md', 'value' => null],
+                                    ['key' => 'lg', 'value' => null],
+                                    ['key' => 'xl', 'value' => null],
+                                    ['key' => '2xl', 'value' => null],
+                                ]);
+                                $set('columns', [
+                                    ['key' => 'default', 'value' => 1],
+                                    ['key' => 'xs', 'value' => null],
+                                    ['key' => 'sm', 'value' => null],
+                                    ['key' => 'md', 'value' => 2],
+                                    ['key' => 'lg', 'value' => null],
+                                    ['key' => 'xl', 'value' => null],
+                                    ['key' => '2xl', 'value' => null],
+                                ]);
+                                $set('column_start', [
+                                    ['key' => 'default', 'value' => null],
+                                    ['key' => 'xs', 'value' => null],
+                                    ['key' => 'sm', 'value' => null],
+                                    ['key' => 'md', 'value' => null],
+                                    ['key' => 'lg', 'value' => null],
+                                    ['key' => 'xl', 'value' => null],
+                                    ['key' => '2xl', 'value' => null],
+                                ]);
+                            }
+                        }),
+                    \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
+                        ->required(fn (Get $get) => $get('first_name') !== null)
+                        ->hint(__('e.g First Name')),
+                    \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
+                        ->hint(__('e.g biodata.first_name'))
+                        ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
+                        ->live(debounce: 500),
+                    \Filament\Forms\Components\Textarea::make('description')->columnSpanFull()->label(__('Description'))->default(''),
+                    \Filament\Forms\Components\Checkbox::make('is_active')->default(true),
+                ]),
+            ...($isFieldsets ? $components : [\Filament\Forms\Components\Section::make($fieldsetLabel ?? 'Specific Field Details')->collapsed()->schema($components)]),
         ];
     }
 
@@ -168,6 +177,7 @@ abstract class Component
                         \Filament\Forms\Components\Select::make('key')
                             ->options([
                                 'default' => __('Default'),
+                                'xs' => __('Extra Small'),
                                 'sm' => __('Small'),
                                 'md' => __('Medium'),
                                 'lg' => __('Large'),
@@ -194,6 +204,7 @@ abstract class Component
                         \Filament\Forms\Components\Select::make('key')
                             ->options([
                                 'default' => __('Default'),
+                                'xs' => __('Extra Small'),
                                 'sm' => __('Small'),
                                 'md' => __('Medium'),
                                 'lg' => __('Large'),
@@ -209,7 +220,7 @@ abstract class Component
                     ->deletable(false)
                     ->addable(false)
                     ->columnSpanFull()
-                    ->label(__('Columns'))
+                    ->label(__('Column Start'))
                     ->helperText(__('Applicable only for layout components')),
                 TableRepeater::make('column_span')
                     ->columnSpanFull()
@@ -224,6 +235,7 @@ abstract class Component
                             ->live()
                             ->options(fn (Get $get) => collect([
                                 'default' => __('Default'),
+                                'xs' => __('Extra Small'),
                                 'sm' => __('Small'),
                                 'md' => __('Medium'),
                                 'lg' => __('Large'),
@@ -270,7 +282,7 @@ abstract class Component
             return collect([]);
         }
 
-        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])])->filter();
     }
 
     protected function prepareColumnStart(): Collection
@@ -284,7 +296,7 @@ abstract class Component
             return collect([]);
         }
 
-        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])])->filter();
     }
 
     protected function prepareColumnSpan(): Collection
@@ -298,7 +310,7 @@ abstract class Component
             return collect();
         }
 
-        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])]);
+        return collect($columns)->mapWithKeys(fn ($column) => [$column['key'] => intval($column['value'])])->filter();
     }
 
     protected function prepareValidationRules(): Collection
@@ -360,7 +372,7 @@ abstract class Component
         }
     }
 
-    protected function makeChildren(): array
+    protected function makeChildren(bool $editable = false): array
     {
         $record = $this->getRecord();
         if (! $record->getAttribute('is_active')) {
@@ -371,7 +383,7 @@ abstract class Component
             $schema = [];
             foreach ($children as $child) {
                 $component = Utils::instantiateClass($child->getAttribute('component_type'), ['record' => $child]);
-                $schema[] = $component->makeComponent();
+                $schema[] = $component->makeComponent($editable);
             }
 
             return $schema;
@@ -466,5 +478,47 @@ abstract class Component
                 \Filament\Forms\Components\Checkbox::make('inlineSuffix')->label(__('Inline Suffix'))->default(false),
             ]),
         ];
+    }
+
+    public function makeEditableAction(&$component, bool $editable)
+    {
+        $record = $this->getRecord();
+
+        $editAction = Action::make('edit_field')->label('Edit Field')
+            ->icon('heroicon-o-pencil-square')
+            ->iconButton()
+            ->color('warning')
+            ->extraAttributes(['class' => 'static'])
+            ->slideOver()
+            ->modalWidth('container')
+            ->form(fn (Form $form) => $form
+                ->model($record)
+                ->schema(VisualFormComponentResource::getSchema()))
+            ->mountUsing(fn (ComponentContainer $form) => $form->fill($record->toArray()))
+            ->action(function (array $data) use ($record) {
+                $record->update($data);
+            });
+        if ($editable) {
+            if (method_exists($component, 'hintAction')) {
+                $component->hintActions([
+                    $editAction,
+                ]);
+            } elseif (method_exists($component, 'headerActions')) {
+                $component->headerActions([
+                    $editAction,
+                ]);
+            }
+
+            if (method_exists($component, 'extraFieldWrapperAttributes')) {
+                $component->extraFieldWrapperAttributes(['class' => 'border-dashed border-primary border-2 border-gray-300 rounded-md p-2']);
+            } elseif (method_exists($component, 'extraAttributes')) {
+                $component->extraAttributes(['class' => 'border-dashed border-primary border-2 border-gray-300 rounded-md p-2']);
+            }
+        }
+    }
+
+    public function openEditModal()
+    {
+        dd('open edit modal');
     }
 }

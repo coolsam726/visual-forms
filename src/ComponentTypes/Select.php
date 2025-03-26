@@ -12,7 +12,7 @@ class Select extends CheckboxList
     /**
      * @throws \Exception
      */
-    public function makeComponent(): \Filament\Forms\Components\Select
+    public function makeComponent(bool $editable = false): \Filament\Forms\Components\Select
     {
         $record = $this->getRecord();
         if (! $record) {
@@ -20,6 +20,8 @@ class Select extends CheckboxList
         }
         $component = \Filament\Forms\Components\Select::make($record->getAttribute('name'));
         $this->configureComponent($component);
+
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }

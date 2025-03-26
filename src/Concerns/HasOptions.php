@@ -27,10 +27,13 @@ trait HasOptions
                 TableRepeater::make('options')->headers([
                     Header::make(__('Value')),
                     Header::make(__('Label')),
+                    Header::make('Should Specify?'),
                 ])->schema([
-                    Forms\Components\TextInput::make('value')->required(),
+                    Forms\Components\TextInput::make('value')->required()->autofocus(),
                     Forms\Components\TextInput::make('label'),
+                    Forms\Components\ToggleButtons::make('should_specify')->boolean()->inline()->default(false),
                 ])
+                    ->columnSpanFull()
                     ->required(fn (Forms\Get $get) => $get('optionsSource') === 'static')
                     ->disabled(fn (Forms\Get $get) => ($get('optionsSource') !== 'static'))
                     ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'static'),

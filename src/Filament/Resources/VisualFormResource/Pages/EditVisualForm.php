@@ -40,4 +40,11 @@ class EditVisualForm extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            VisualFormResource\Widgets\FieldEditor::make(),
+        ];
+    }
 }

@@ -34,9 +34,9 @@ class VisualForm extends Model
         return $this->hasMany(\Config::get('visual-forms.models.visual_form_entry'), 'form_id');
     }
 
-    public function schema()
+    public function schema(bool $editable = false)
     {
-        return VisualForms::schema($this);
+        return VisualForms::schema($this, $editable);
     }
 
     public function recordSubmission(array $data, bool $isProcessed = false)

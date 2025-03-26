@@ -21,7 +21,7 @@ class Checkbox extends Component
         return false;
     }
 
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         $record = $this->getRecord();
         if (! $record) {
@@ -95,6 +95,8 @@ class Checkbox extends Component
         }
 
         $this->makeValidation($component);
+
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }

@@ -151,7 +151,7 @@ class TextInput extends Component
     /**
      * @throws Exception
      */
-    public function makeComponent(): \Filament\Forms\Components\TextInput
+    public function makeComponent(bool $editable = false): \Filament\Forms\Components\TextInput
     {
         /**
          * 'autocapitalize' => Boolean::class,
@@ -338,6 +338,8 @@ class TextInput extends Component
         if ($props->get('unique')) {
             $this->makeUnique($control);
         }
+
+        $this->makeEditableAction($control, $editable);
 
         return $control;
     }

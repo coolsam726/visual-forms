@@ -139,7 +139,7 @@ class VisualForms
         ])->mapWithKeys(fn ($rule) => [$rule => $rule]);
     }
 
-    public function schema(VisualForm $form): array
+    public function schema(VisualForm $form, bool $editable = false): array
     {
         // if the form is not active, render a placeholder to show that error
         if (! $form->getAttribute('is_active')) {
@@ -153,7 +153,7 @@ class VisualForms
         return $form->children()->where('is_active', true)->whereNull('parent_id')
             ->orderBy('sort_order')->get()->map(fn (
                 VisualFormComponent $field
-            ) => $field->makeComponent())->toArray();
+            ) => $field->makeComponent($editable))->toArray();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
+use Coolsam\VisualForms\Filament\Components\ExtendedFieldset;
 use Coolsam\VisualForms\Utils;
 
 class Fieldset extends Component
@@ -21,19 +22,20 @@ class Fieldset extends Component
         return true;
     }
 
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         $record = $this->getRecord();
         if (! $record) {
             throw new \Exception('Record not found');
         }
-        $component = \Filament\Forms\Components\Fieldset::make($record->getAttribute('label'));
+        $component = ExtendedFieldset::make($record->getAttribute('label'));
         $this->makeColumns($component);
         if ($this->getProps()->isNotEmpty()) {
             $component->disabled(Utils::getBool($this->getProps()->get('disabled')));
         }
         $this->makeStatePath($component);
-        $component->schema($this->makeChildren());
+        $component->schema($this->makeChildren($editable));
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }

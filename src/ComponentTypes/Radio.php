@@ -12,7 +12,7 @@ class Radio extends CheckboxList
     /**
      * @throws \Exception
      */
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         if (! $record = $this->getRecord()) {
             throw new \Exception('Record not found');
@@ -21,6 +21,8 @@ class Radio extends CheckboxList
         $component = \Filament\Forms\Components\Radio::make($record->getAttribute('name'));
 
         $this->configureComponent($component);
+
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }

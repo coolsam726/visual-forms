@@ -24,7 +24,7 @@ class CheckboxList extends Component
         return false;
     }
 
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         $record = $this->getRecord();
         if (! $record) {
@@ -34,6 +34,7 @@ class CheckboxList extends Component
         $component = \Filament\Forms\Components\CheckboxList::make($record->getAttribute('name'));
 
         $this->configureComponent($component);
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }
@@ -103,14 +104,9 @@ class CheckboxList extends Component
         return $this->extendCommonSchema(
             [
                 \Filament\Forms\Components\Fieldset::make(__($this->getOptionName() . ' Properties'))
-                    ->columns([
-                        'md' => 2,
-                        'xl' => 3,
-                    ])
                     ->statePath('props')->schema(
                         $this->getMainSchemaFields()
                     ),
-
             ]
         );
     }
