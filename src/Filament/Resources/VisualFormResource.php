@@ -115,8 +115,8 @@ class VisualFormResource extends Resource
     public static function getRelations(): array
     {
         return [
-//            Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
-//            Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
+            //            Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
+            //            Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
         ];
     }
 }

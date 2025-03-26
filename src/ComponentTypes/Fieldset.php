@@ -36,6 +36,7 @@ class Fieldset extends Component
         $this->makeStatePath($component);
         $component->schema($this->makeChildren($editable));
         $this->makeEditableAction($component, $editable);
+
         return $component;
     }
 

@@ -10,7 +10,6 @@ class Select extends CheckboxList
     }
 
     /**
-     * @param  bool  $editable
      * @throws \Exception
      */
     public function makeComponent(bool $editable = false): \Filament\Forms\Components\Select

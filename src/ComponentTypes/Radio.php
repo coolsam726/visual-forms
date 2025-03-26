@@ -10,7 +10,6 @@ class Radio extends CheckboxList
     }
 
     /**
-     * @param  bool  $editable
      * @throws \Exception
      */
     public function makeComponent(bool $editable = false)
@@ -24,6 +23,7 @@ class Radio extends CheckboxList
         $this->configureComponent($component);
 
         $this->makeEditableAction($component, $editable);
+
         return $component;
     }
 

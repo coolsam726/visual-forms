@@ -2,12 +2,8 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
 use Coolsam\VisualForms\Utils;
 use Exception;
-use Filament\Forms\ComponentContainer;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Forms\Get;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;

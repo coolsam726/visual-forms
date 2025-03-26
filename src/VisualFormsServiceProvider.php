@@ -88,7 +88,7 @@ class VisualFormsServiceProvider extends PackageServiceProvider
 
         $this->callAfterResolving(BladeCompiler::class, function () {
             Livewire::component('edit-visual-component', EditVisualComponent::class);
-         });
+        });
 
         // Handle Stubs
         if (app()->runningInConsole()) {
@@ -98,7 +98,6 @@ class VisualFormsServiceProvider extends PackageServiceProvider
                 ], 'visual-forms-stubs');
             }
         }
-
 
         // Testing
         Testable::mixin(new TestsVisualForms);
