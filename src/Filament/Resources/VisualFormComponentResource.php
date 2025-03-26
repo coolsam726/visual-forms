@@ -5,6 +5,7 @@ namespace Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource\Pages;
 use Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers\ComponentsRelationManager;
+use Coolsam\VisualForms\Models\VisualForm;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
 use Filament\Forms;
@@ -116,8 +117,12 @@ class VisualFormComponentResource extends Resource
                     Forms\Components\Select::make('parent_id')->label(__('Parent Component'))
                         ->live()
                         ->searchable()
-                        ->visible(fn ($record) => (bool) $record?->getAttribute('id'))
+                        ->visible(fn ($record, $state) => (bool) $record?->getAttribute('id') || $state)
                         ->options(Utils::getEligibleParentComponents()->toArray()),
+//                    Forms\Components\Fieldset::make(__('Order'))->schema([
+//                        Forms\Components\Select::make('sort_order')
+//                            ->label(__('Create After')),
+//                    ]),
                 ]),
                 Forms\Components\Tabs\Tab::make(__('Component Details'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
@@ -141,7 +146,7 @@ class VisualFormComponentResource extends Resource
                         Forms\Get $get
                     ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
             ])
-                ->activeTab(fn ($record) => $record ? 2 : 1)
+                ->activeTab(fn ($record) => $record?->id ? 2 : 1)
                 ->extraAttributes(['class' => 'fi-fo-wizard-vertical'])
                 ->columnSpanFull(),
         ];
