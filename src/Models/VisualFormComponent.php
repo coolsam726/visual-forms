@@ -44,10 +44,10 @@ class VisualFormComponent extends Model
         return (new $class)->getProps($this);
     }
 
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         $class = $this->getAttribute('component_type');
 
-        return Utils::instantiateClass($class, ['record' => $this])->makeComponent();
+        return Utils::instantiateClass($class, ['record' => $this])->makeComponent($editable);
     }
 }

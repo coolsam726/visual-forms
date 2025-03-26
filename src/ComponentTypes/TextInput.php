@@ -2,8 +2,12 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
+use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
 use Coolsam\VisualForms\Utils;
 use Exception;
+use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
 use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Boolean;
@@ -151,7 +155,7 @@ class TextInput extends Component
     /**
      * @throws Exception
      */
-    public function makeComponent(): \Filament\Forms\Components\TextInput
+    public function makeComponent(bool $editable = false): \Filament\Forms\Components\TextInput
     {
         /**
          * 'autocapitalize' => Boolean::class,
@@ -338,6 +342,8 @@ class TextInput extends Component
         if ($props->get('unique')) {
             $this->makeUnique($control);
         }
+
+        $this->makeEditableAction($control, $editable);
 
         return $control;
     }

@@ -2,6 +2,7 @@
 
 namespace Coolsam\VisualForms;
 
+use Coolsam\VisualForms\Livewire\EditVisualComponent;
 use Coolsam\VisualForms\Testing\TestsVisualForms;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
@@ -10,8 +11,10 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\View\Compilers\BladeCompiler;
 use Kalnoy\Nestedset\NestedSetServiceProvider;
 use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -83,6 +86,10 @@ class VisualFormsServiceProvider extends PackageServiceProvider
         // Icon Registration
         FilamentIcon::register($this->getIcons());
 
+        $this->callAfterResolving(BladeCompiler::class, function () {
+            Livewire::component('edit-visual-component', EditVisualComponent::class);
+         });
+
         // Handle Stubs
         if (app()->runningInConsole()) {
             foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
@@ -91,6 +98,7 @@ class VisualFormsServiceProvider extends PackageServiceProvider
                 ], 'visual-forms-stubs');
             }
         }
+
 
         // Testing
         Testable::mixin(new TestsVisualForms);

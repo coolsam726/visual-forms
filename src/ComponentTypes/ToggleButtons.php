@@ -9,7 +9,7 @@ class ToggleButtons extends Radio
         return __('Toggle Buttons');
     }
 
-    public function makeComponent()
+    public function makeComponent(bool $editable = false)
     {
         $record = $this->getRecord();
         if (! $record) {
@@ -17,6 +17,8 @@ class ToggleButtons extends Radio
         }
         $component = \Filament\Forms\Components\ToggleButtons::make($record->getAttribute('name'));
         $this->configureComponent($component);
+
+        $this->makeEditableAction($component, $editable);
 
         return $component;
     }

@@ -29,6 +29,13 @@ class VisualFormResource extends Resource
         return \Config::get('visual-forms.models.visual_form');
     }
 
+    public static function getWidgets(): array
+    {
+        return [
+            Resources\VisualFormResource\Widgets\FieldEditor::make(),
+        ];
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -108,9 +115,8 @@ class VisualFormResource extends Resource
     public static function getRelations(): array
     {
         return [
-            Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
-            //            Resources\VisualFormResource\RelationManagers\FieldsRelationManager::class,
-            Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
+//            Resources\VisualFormResource\RelationManagers\ComponentsRelationManager::class,
+//            Resources\VisualFormResource\RelationManagers\EntriesRelationManager::class,
         ];
     }
 }

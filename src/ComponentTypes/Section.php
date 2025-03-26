@@ -23,7 +23,7 @@ class Section extends Component
         return true;
     }
 
-    public function makeComponent(): \Filament\Forms\Components\Section
+    public function makeComponent(bool $editable = false): \Filament\Forms\Components\Section
     {
         $record = $this->getRecord();
         if (! $record) {
@@ -51,7 +51,8 @@ class Section extends Component
             }
         }
 
-        $component->schema($this->makeChildren());
+        $this->makeEditableAction($component, $editable);
+        $component->schema($this->makeChildren($editable));
 
         return $component;
     }

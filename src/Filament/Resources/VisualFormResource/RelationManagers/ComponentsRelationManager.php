@@ -37,6 +37,7 @@ class ComponentsRelationManager extends RelationManager
             ->modalWidth('container');
     }
 
+
     public static function canViewForRecord(Model | VisualForm | VisualFormComponent $ownerRecord, string $pageClass): bool
     {
 

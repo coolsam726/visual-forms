@@ -106,8 +106,8 @@ class VisualFormComponentResource extends Resource
     public static function getSchema(): array
     {
         return [
-            Forms\Components\Wizard::make([
-                Forms\Components\Wizard\Step::make(__('Step 1: Component Type'))->lazy()->schema([
+            Forms\Components\Tabs::make()->schema([
+                Forms\Components\Tabs\Tab::make(__('Component Type'))->schema([
                     Forms\Components\Select::make('component_type')
                         ->required()
                         ->live()
@@ -119,22 +119,21 @@ class VisualFormComponentResource extends Resource
                         ->visible(fn ($record) => (bool) $record?->getAttribute('id'))
                         ->options(Utils::getEligibleParentComponents()->toArray()),
                 ]),
-                Forms\Components\Wizard\Step::make(__('Component Details'))
-                    ->lazy()
+                Forms\Components\Tabs\Tab::make(__('Component Details'))
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getMainSchema()),
-                Forms\Components\Wizard\Step::make(__('Configure Options'))
+                Forms\Components\Tabs\Tab::make(__('Configure Options'))
                     ->lazy()
                     ->visible(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions())
                     ->schema(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions() ?
                     Utils::instantiateClass($get('component_type'))->extendOptionsSchema() : []),
-                Forms\Components\Wizard\Step::make(__('Configure Columns'))
+                Forms\Components\Tabs\Tab::make(__('Configure Columns'))
                     ->lazy()
                     ->schema(
                         fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getColumnsSchema()
                     ),
-                Forms\Components\Wizard\Step::make(__('Validation Rules'))
+                Forms\Components\Tabs\Tab::make(__('Validation Rules'))
                     ->lazy()
                     ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
                         Utils::instantiateClass($get('component_type'))->getValidationSchema())
@@ -142,7 +141,7 @@ class VisualFormComponentResource extends Resource
                         Forms\Get $get
                     ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
             ])
-                ->startOnStep(fn ($record) => $record ? 2 : 1)
+                ->activeTab(fn ($record) => $record ? 2 : 1)
                 ->extraAttributes(['class' => 'fi-fo-wizard-vertical'])
                 ->columnSpanFull(),
         ];
