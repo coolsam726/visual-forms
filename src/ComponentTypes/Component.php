@@ -601,7 +601,9 @@ abstract class Component
                 ])
                     ->columnSpanFull()
                     ->columns(1),
-            ])->modalSubmitAction(false);
+            ])
+            ->modalFooterActions()
+            ->modalSubmitAction(false);
         if ($editable) {
             $actions = [
                 $editAction,
