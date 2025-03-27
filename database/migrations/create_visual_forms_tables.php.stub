@@ -16,75 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->jsonb('settings')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
-
-        // Create Visual Form Fields table
-        Schema::create(Config::get('visual-forms.tables.visual_form_fields'), function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('form_id')->constrained(Config::get('visual-forms.tables.visual_forms'))->onDelete('cascade');
-            $table->string('name');
-            $table->ulid()->unique();
-            $table->string('control_type')->default(ControlTypes::TextInput->name);
-            $table->string('label')->nullable();
-            $table->string('placeholder')->nullable();
-
-            // Common characteristics
-            $table->boolean('required')->default(false);
-            $table->boolean('unique')->default(false);
-            $table->boolean('disabled')->default(false);
-            $table->boolean('readonly')->default(false);
-            $table->boolean('multiple')->default(false);
-            $table->boolean('inline_label')->default(false);
-            $table->boolean('inline')->default(false);
-            $table->boolean('hidden_label')->default(false);
-            $table->boolean('autofocus')->default(false);
-            $table->boolean('autocapitalize')->default(false);
-            $table->boolean('autocomplete')->default(false);
-            $table->boolean('searchable')->default(false);
-            $table->boolean('colspan_full')->default(false);
-
-            $table->integer('rows')->default(5);
-            $table->integer('colspan')->default(1);
-            $table->integer('max_length')->nullable();
-            $table->integer('min_length')->nullable();
-            $table->integer('max')->nullable();
-            $table->integer('min')->nullable();
-            $table->integer('step')->nullable();
-            $table->string('pattern')->nullable();
-            $table->string('mask')->nullable();
-
-            // For file upload
-            $table->integer('max_file_size')->nullable();
-            $table->integer('max_files')->nullable();
-            $table->json('accepted_file_types')->nullable();
-
-            $table->string('type')->default('text');
-            $table->enum('live_status', ['off', 'on', 'onBlur', 'debounced'])->default('off');
-            $table->integer('debounce_time')->default(300);
-            $table->json('validation_rules')->nullable();
-            $table->json('options')->nullable();
-            $table->string('default_value')->nullable();
-            $table->string('prefix_icon')->nullable();
-            $table->string('suffix_icon')->nullable();
-            $table->boolean('inline_prefix')->default(false);
-            $table->boolean('inline_suffix')->default(false);
-            $table->string('helper_text')->nullable();
-            $table->string('hint')->nullable();
-
-            $table->boolean('options_from_db')->default(false);
-            $table->string('options_db_table')->nullable();
-            $table->string('options_key_attribute')->nullable();
-            $table->string('options_value_attribute')->nullable();
-            $table->json('options_where_conditions')->nullable();
-            $table->json('options_order_by')->nullable();
-            $table->enum('options_order_direction', ['asc', 'desc'])->default('asc');
-
-            // other attributes
-            $table->json('extra_props')->nullable();
-            $table->json('extra_attributes')->nullable();
-            $table->bigInteger('sort_order')->default(0);
             $table->timestamps();
         });
 

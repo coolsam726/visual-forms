@@ -74,22 +74,5 @@ class VisualFormComponent extends Model implements Sortable
 
     protected static function booted()
     {
-        //        self::saved(function (VisualFormComponent $model) {
-        //            // sort the siblings
-        //            if ($model->sort_order < 1) {
-        //                $model->setHighestOrderNumber();
-        //            }
-        //            if ($model->getAttribute('parent_id') !== null) {
-        //                // if sort is zero, set the highest order
-        //                $ids = $model->siblingsAndSelf()
-        //                    ->where('is_active', '=', true)
-        //                    ->orderBy('sort_order')
-        //                    ->orderBy('created_at')
-        //                    ->pluck('id')
-        //                    ->values()
-        //                    ->toArray();
-        //                VisualFormComponent::setNewOrder($ids);
-        //            }
-        //        });
     }
 }
