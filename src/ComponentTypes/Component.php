@@ -548,7 +548,7 @@ abstract class Component
             ->size('xs')
             ->extraAttributes(['class' => 'static'])
             ->requiresConfirmation()
-            ->modalContent(fn() => new HtmlString(__('This will delete this component and all its children if any.')))
+            ->modalContent(fn () => new HtmlString(__('This will delete this component and all its children if any.')))
             ->action(function () use ($record) {
                 $record->deleteOrFail();
             });
@@ -606,7 +606,7 @@ abstract class Component
             $actions = [
                 $editAction,
                 $deleteAction,
-                $sortAction
+                $sortAction,
             ];
             /**
              * @var Component $componentType
