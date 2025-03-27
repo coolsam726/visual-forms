@@ -150,7 +150,8 @@ class VisualForms
             ];
         }
 
-        return $form->children()->where('is_active', true)->whereNull('parent_id')
+        return $form->children()
+            ->where('is_active', true)->whereNull('parent_id')
             ->orderBy('sort_order')->get()->map(fn (
                 VisualFormComponent $field
             ) => $field->makeComponent($editable))->toArray();

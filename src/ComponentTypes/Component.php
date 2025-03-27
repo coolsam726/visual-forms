@@ -10,12 +10,13 @@ use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
 use Filament\Forms\ComponentContainer;
+use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
 
 abstract class Component
@@ -65,7 +66,7 @@ abstract class Component
                     \Filament\Forms\Components\TextInput::make('name')->label(__('Name'))
                         ->hint(__('e.g first_name'))
                         ->required()
-                        ->live(debounce: 500)
+                        ->live(onBlur: true)
                         ->afterStateUpdated(function ($state, Set $set, Get $get) {
                             $set(
                                 'label',
@@ -112,11 +113,11 @@ abstract class Component
                     \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
                         ->hint(__('e.g biodata.first_name'))
                         ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
-                        ->live(debounce: 500),
+                        ->live(onBlur: true),
                     \Filament\Forms\Components\Textarea::make('description')->columnSpanFull()->label(__('Description'))->default(''),
                     \Filament\Forms\Components\Checkbox::make('is_active')->default(true),
                 ]),
-            ...($isFieldsets ? $components : [\Filament\Forms\Components\Section::make($fieldsetLabel ?? 'Specific Field Details')->collapsed()->schema($components)]),
+            ...($isFieldsets ? $components : [\Filament\Forms\Components\Section::make($fieldsetLabel ?? 'Specific Field Details')->collapsible()->schema($components)]),
         ];
     }
 
@@ -379,7 +380,11 @@ abstract class Component
             return [];
         }
         if (Utils::instantiateClass($record->getAttribute('component_type'))->hasChildren()) {
-            $children = $record->children()->where('is_active', '=', true)->get();
+            $children = $record->children()
+                ->where('is_active', '=', true)
+                ->orderBy('sort_order')
+                ->orderBy('created_at')
+                ->get();
             $schema = [];
             foreach ($children as $child) {
                 $component = Utils::instantiateClass($child->getAttribute('component_type'), ['record' => $child]);
@@ -402,7 +407,10 @@ abstract class Component
         }
 
         if ($this->getProps()->get('unique')) {
-            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $this->getRecord()->getAttribute('name'));
+            $rule = Rule::unique(
+                \Config::get('visual-forms.tables.visual_form_entries'),
+                'payload->' . $this->getRecord()->getAttribute('name')
+            );
             if ($this->getRecord()->getAttribute('id')) {
                 $rule = $rule->ignore($this->getRecord()->getAttribute('id'));
             }
@@ -463,32 +471,45 @@ abstract class Component
     protected function affixesSchema(): array
     {
         return [
-            \Filament\Forms\Components\Fieldset::make(__('Affixes'))->statePath('props')->columnSpanFull()->schema([
-                \Filament\Forms\Components\TextInput::make('prefix')->label(__('Prefix'))->live(debounce: 1000),
-                \Filament\Forms\Components\TextInput::make('suffix')->label(__('Suffix'))->live(debounce: 1000),
-                \Filament\Forms\Components\Select::make('prefixIcon')->label(__('Prefix Icon'))->options(Utils::getHeroicons())->searchable(),
-                \Filament\Forms\Components\Select::make('suffixIcon')->label(__('Suffix Icon'))->options(Utils::getHeroicons())->searchable(),
-                \Filament\Forms\Components\Select::make('prefixIconColor')->label(__('Prefix Icon Color'))
-                    ->live()->visible(fn ($get) => $get('prefixIcon'))->options(Utils::getAppColors()),
-                \Filament\Forms\Components\Select::make('suffixIconColor')->label(__('Suffix Icon Color'))
-                    ->live()->visible(fn ($get) => $get('suffixIcon'))
-                    ->options(Utils::getAppColors()),
+            \Filament\Forms\Components\Placeholder::make('affixes')->label(new HtmlString("<h3 class='font-black text-md'>" . __('Affixes') . '</h3>'))->columnSpanFull(),
+            \Filament\Forms\Components\Fieldset::make(__('Prefix'))
+                ->statePath('props')
+                ->columns([
+                    'md' => 2, 'lg' => 3, 'xl' => 4,
+                ])->schema([
+                    \Filament\Forms\Components\TextInput::make('prefix')->label(__('Prefix'))->live(onBlur: true),
+                    \Filament\Forms\Components\Select::make('prefixIcon')->label(__('Prefix Icon'))->live(onBlur: true)->options(Utils::getHeroicons())->searchable(),
+                    \Filament\Forms\Components\ToggleButtons::make('inlinePrefix')->boolean()->inline()->label(__('Inline Prefix'))->default(false),
+                    \Filament\Forms\Components\Select::make('prefixIconColor')->label(__('Prefix Icon Color'))
+                        ->live()->visible(fn ($get) => $get('prefixIcon'))->options(Utils::getAppColors())->native(false),
+                ]),
 
-                \Filament\Forms\Components\Checkbox::make('inlinePrefix')->label(__('Inline Prefix'))->default(false),
-                \Filament\Forms\Components\Checkbox::make('inlineSuffix')->label(__('Inline Suffix'))->default(false),
-            ]),
+            \Filament\Forms\Components\Fieldset::make(__('Suffix'))->columns([
+                'md' => 2, 'lg' => 3, 'xl' => 4,
+            ])
+                ->statePath('props')
+                ->schema([
+                    \Filament\Forms\Components\TextInput::make('suffix')->label(__('Suffix'))->live(onBlur: true),
+                    \Filament\Forms\Components\Select::make('suffixIcon')->label(__('Suffix Icon'))->live()->options(Utils::getHeroicons())->searchable(),
+                    \Filament\Forms\Components\ToggleButtons::make('inlineSuffix')->boolean()->inline()->label(__('Inline Suffix'))->default(false),
+                    \Filament\Forms\Components\Select::make('suffixIconColor')->label(__('Suffix Icon Color'))
+                        ->live()->visible(fn ($get) => $get('suffixIcon'))
+                        ->options(Utils::getAppColors())->native(false),
+                ]),
         ];
     }
 
-    public function makeEditableAction(&$component, bool $editable)
+    public function makeEditableAction(&$component, bool $editable): void
     {
         $record = $this->getRecord();
 
         $createAction = Action::make('create_field')->label(__('Add a Component'))
             ->icon('heroicon-o-plus-circle')
             ->iconButton()
+            ->size('xs')
             ->color('success')
             ->extraAttributes(['class' => 'static'])
+            ->authorize('create', \Config::get('visual-forms.models.visual_form_component'))
             ->form(fn (Form $form) => $form
                 ->model(VisualFormComponent::class)
                 ->schema(VisualFormComponentResource::getSchema()))
@@ -497,7 +518,7 @@ abstract class Component
             ]))
             ->action(function (array $data) use ($record) {
                 $data['form_id'] = $record->getKey();
-                $record->creatComponent($data);
+                $record->createChild($data);
 
                 return $record;
             });
@@ -505,7 +526,9 @@ abstract class Component
         $editAction = Action::make('edit_field')->label(__('Edit Component'))
             ->icon('heroicon-o-pencil-square')
             ->iconButton()
+            ->authorize('update', $record)
             ->color('warning')
+            ->size('xs')
             ->extraAttributes(['class' => 'static'])
             ->slideOver()
             ->modalWidth('container')
@@ -516,9 +539,74 @@ abstract class Component
             ->action(function (array $data) use ($record) {
                 $record->update($data);
             });
+
+        $deleteAction = Action::make('action_delete_component')->label(__('Delete Component'))
+            ->icon('heroicon-o-trash')
+            ->iconButton()
+            ->authorize('delete', $record)
+            ->color('danger')
+            ->size('xs')
+            ->extraAttributes(['class' => 'static'])
+            ->requiresConfirmation()
+            ->modalContent(fn () => new HtmlString(__('This will delete this component and all its children if any.')))
+            ->action(function () use ($record) {
+                $record->deleteOrFail();
+            });
+
+        $upAction = Action::make('sort')->label(__('Move Up'))
+            ->icon('heroicon-o-chevron-up')
+            ->size('xs')
+            ->outlined()
+            ->color('primary')
+            ->action(function (array $data) use ($record) {
+                $record->moveOrderUp();
+            });
+        $downAction = Action::make('action_move_down')->label(__('Move Down'))
+            ->icon('heroicon-o-chevron-down')
+            ->color('primary')
+            ->size('xs')
+            ->outlined()
+            ->action(function (array $data) use ($record) {
+                $record->moveOrderDown();
+            });
+        $startAction = Action::make('action_move_to_start')->label(__('Move to Start'))
+            ->icon('heroicon-o-chevron-double-up')
+            ->color('primary')
+            ->size('xs')
+            ->outlined()
+            ->action(function (array $data) use ($record) {
+                $record->moveToStart();
+            });
+        $endAction = Action::make('action_move_to_end')->label(__('Move to End'))
+            ->icon('heroicon-o-chevron-double-down')
+            ->color('primary')
+            ->size('xs')
+            ->outlined()
+            ->action(function (array $data) use ($record) {
+                $record->moveToEnd();
+            });
+
+        $sortAction = Action::make('sort')->label(__('Sort'))
+            ->icon('heroicon-o-arrows-up-down')
+            ->outlined()
+            ->size('xs')
+            ->color('gray')
+            ->modalWidth('lg')
+            ->form([
+                Actions::make([
+                    $upAction,
+                    $downAction,
+                    $startAction,
+                    $endAction,
+                ])
+                    ->columnSpanFull()
+                    ->columns(1),
+            ])->modalSubmitAction(false);
         if ($editable) {
             $actions = [
                 $editAction,
+                $deleteAction,
+                $sortAction,
             ];
             /**
              * @var Component $componentType
@@ -528,6 +616,8 @@ abstract class Component
                 $actions = [
                     $createAction,
                     $editAction,
+                    $deleteAction,
+                    $sortAction,
                 ];
             }
             if (method_exists($component, 'hintAction')) {

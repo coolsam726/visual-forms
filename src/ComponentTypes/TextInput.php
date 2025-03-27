@@ -39,8 +39,8 @@ class TextInput extends Component
                     \Filament\Forms\Components\TextInput::make('placeholder')->label(__('Placeholder'))->autocapitalize(),
                     \Filament\Forms\Components\TextInput::make('helper_text')->label(__('Helper Text')),
                     \Filament\Forms\Components\TextInput::make('hint')->label(__('Hint')),
-                    \Filament\Forms\Components\Checkbox::make('autocapitalize')->label(__('Autocapitalize')),
-                    \Filament\Forms\Components\Checkbox::make('autocomplete')->label(__('Autocomplete')),
+                    \Filament\Forms\Components\ToggleButtons::make('autocapitalize')->boolean()->inline()->default(false)->label(__('Autocapitalize')),
+                    \Filament\Forms\Components\ToggleButtons::make('autocomplete')->boolean()->inline()->default(false)->label(__('Autocomplete')),
                 ])->columns(3),
             ...$this->affixesSchema(),
         ]);
