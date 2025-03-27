@@ -503,8 +503,9 @@ abstract class Component
     {
         $record = $this->getRecord();
 
-        $createAction = Action::make('create_field')->label(__('Add a Component'))
-            ->icon('heroicon-o-plus-circle')
+        $createAction = Action::make('create_field')
+            ->label(__('Add a Component'))
+            ->icon('heroicon-o-plus')
             ->iconButton()
             ->size('xs')
             ->color('success')

@@ -25,7 +25,7 @@ return [
                 return true;
             },
             'create' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
+                return false;
             },
             'update' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
                 return true;
@@ -33,10 +33,16 @@ return [
             'delete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
                 return true;
             },
-            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
+            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
                 return true;
             },
-            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
+            'restore' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
+                return true;
+            },
+            'forceDelete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
+                return true;
+            },
+            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
                 return true;
             },
         ],
@@ -56,10 +62,16 @@ return [
             'delete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
                 return true;
             },
-            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
+            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
                 return true;
             },
-            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
+            'restore' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
+                return true;
+            },
+            'forceDelete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
+                return true;
+            },
+            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
                 return true;
             },
         ],
