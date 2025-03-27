@@ -83,6 +83,13 @@ class CheckboxList extends Component
             }
         }
 
+        if (method_exists($component, 'boolean') && Utils::getBool($props->get('boolean'))) {
+           $component->boolean();
+            if ($props->get('default') !== null) {
+                $component->default(Utils::getBool($props->get('default')));
+            }
+        }
+
         if (Utils::getBool($props->get('unique'))) {
             $component->unique();
         }
