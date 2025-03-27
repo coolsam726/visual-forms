@@ -19,11 +19,6 @@ class VisualForm extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function fields(): HasMany
-    {
-        return $this->hasMany(\Config::get('visual-forms.models.visual_form_field'), 'form_id');
-    }
-
     public function children(): HasMany
     {
         return $this->hasMany(\Config::get('visual-forms.models.visual_form_component'), 'form_id');

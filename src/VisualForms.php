@@ -2,36 +2,21 @@
 
 namespace Coolsam\VisualForms;
 
-use Awcodes\TableRepeater\Components\TableRepeater;
 use Coolsam\VisualForms\ComponentTypes\Component;
 use Coolsam\VisualForms\Models\VisualForm;
 use Coolsam\VisualForms\Models\VisualFormComponent;
-use Coolsam\VisualForms\Models\VisualFormField;
 use Filament\Forms\Components;
+use File;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
-use Illuminate\Validation\Rule;
 use Symfony\Component\Finder\SplFileInfo;
 
 class VisualForms
 {
-    /**
-     * @deprecated This will be removed once we switch to components. Replaced by getComponentTypeOptions()
-     */
-    public function getControlTypeOptions(): Collection
-    {
-        // get options from ControlTypes enum, as a key value array
-        return collect(ControlTypes::cases())
-            ->pluck('value', 'name')
-            ->mapWithKeys(fn ($value, $key) => [
-                $key => str($value)->camel()->snake()->title()->explode('_')->join(' '),
-            ]);
-    }
-
     public function getComponentTypeOptions(): Collection
     {
-        $files = \File::allFiles(__DIR__ . '/ComponentTypes');
+        $files = File::allFiles(__DIR__ . '/ComponentTypes');
 
         return collect($files)
             ->map(fn (SplFileInfo $file) => Utils::getFileNamespace($file, 'Coolsam\VisualForms\ComponentTypes'))
@@ -157,166 +142,6 @@ class VisualForms
             ) => $field->makeComponent($editable))->toArray();
     }
 
-    /**
-     * @deprecated Will be removed once we switch to components. Replaced by makeComponent()
-     *
-     * @return TableRepeater|Components\Checkbox|Components\DatePicker|Components\FileUpload|Components\Hidden|Components\KeyValue|Components\MarkdownEditor|Components\Radio|Components\Repeater|Components\RichEditor|Components\Select|Components\Textarea|Components\TextInput|Components\TimePicker|Components\ToggleButtons
-     */
-    public function makeField(VisualFormField $field)
-    {
-        $control = match ($field->getAttribute(key: 'control_type')) {
-            default => Components\TextInput::make($field->getAttribute('name')),
-            ControlTypes::Select->value => Components\Select::make($field->getAttribute('name')),
-            ControlTypes::Textarea->value => Components\Textarea::make($field->getAttribute('name')),
-            ControlTypes::TagsInput->value => Components\TagsInput::make($field->getAttribute('name')),
-            ControlTypes::Radio->value => Components\Radio::make($field->getAttribute('name')),
-            ControlTypes::Toggle->value => Components\Toggle::make($field->getAttribute('name')),
-            ControlTypes::CheckboxList->value => Components\CheckboxList::make($field->getAttribute('name')),
-            ControlTypes::Checkbox->value => Components\Checkbox::make($field->getAttribute('name')),
-            ControlTypes::FileUpload->value => Components\FileUpload::make($field->getAttribute('name')),
-            ControlTypes::DatePicker->value => Components\DatePicker::make($field->getAttribute('name')),
-            ControlTypes::TimePicker->value => Components\TimePicker::make($field->getAttribute('name')),
-            ControlTypes::DateTimePicker->value => Components\DateTimePicker::make($field->getAttribute('name')),
-            ControlTypes::RichEditor->value => Components\RichEditor::make($field->getAttribute('name')),
-            ControlTypes::MarkdownEditor->value => Components\MarkdownEditor::make($field->getAttribute('name')),
-            ControlTypes::Repeater->value => Components\Repeater::make($field->getAttribute('name')),
-            ControlTypes::KeyValue->value => Components\KeyValue::make($field->getAttribute('name')),
-            ControlTypes::ColorPicker->value => Components\ColorPicker::make($field->getAttribute('name')),
-            ControlTypes::ToggleButtons->value => Components\ToggleButtons::make($field->getAttribute('name')),
-            ControlTypes::TableRepeater->value => TableRepeater::make($field->getAttribute('name')),
-            ControlTypes::Hidden->value => Components\Hidden::make($field->getAttribute('name')),
-        };
-        $control->required($field->getAttribute('required'))->label($field->getAttribute('label'))
-            ->disabled($field->getAttribute('disabled'))
-            ->helperText($field->getAttribute('helper_text'));
-
-        if ($field->getAttribute('default_value') != null) {
-            $control->default($field->getAttribute('default_value'));
-        }
-        if (ControlTypes::hasAutocomplete($field->getAttribute('control_type'))) {
-            $control->autocomplete($field->getAttribute('autocomplete'));
-        }
-
-        if (ControlTypes::hasAutocapitalize($field->getAttribute('control_type'))) {
-            $control->autocapitalize($field->getAttribute('autocapitalize'));
-        }
-
-        if (ControlTypes::hasOptions($field->getAttribute('control_type'))) {
-            $options = $this->makeOptions($field);
-            $control->options($options);
-        }
-
-        if ($field->getAttribute('colspan_full')) {
-            $control->columnSpanFull();
-        } elseif ($field->getAttribute('colspan') > 1) {
-            $control->columnSpan($field->getAttribute('colspan'));
-        }
-
-        // Handle unique
-        if ($field->getAttribute('unique')) {
-            $rule = Rule::unique(\Config::get('visual-forms.tables.visual_form_entries'), 'payload->' . $field->getAttribute('name'));
-            if ($field->getAttribute('id')) {
-                $rule = $rule->ignore($field->getAttribute('id'));
-            }
-            $control->rule($rule);
-        }
-
-        if (ControlTypes::hasSearchable($field->getAttribute('control_type'))) {
-            $control->searchable($field->getAttribute('searchable'));
-        }
-
-        if (ControlTypes::hasPlaceholder($field->getAttribute('control_type'))) {
-            $control->placeholder($field->getAttribute('placeholder'));
-        }
-
-        if (ControlTypes::hasAutofocus($field->getAttribute('control_type'))) {
-            $control->autofocus($field->getAttribute('autofocus'));
-        }
-
-        if (ControlTypes::hasReadonly($field->getAttribute('control_type'))) {
-            $control->readonly($field->getAttribute('readonly'));
-        }
-
-        if (ControlTypes::hasPrefixAndSuffix($field->getAttribute('control_type'))) {
-            if ($field->getAttribute('prefix_icon')) {
-                $control->prefixIcon($field->getAttribute('prefix_icon'))->inlinePrefix($field->getAttribute('inline_prefix'));
-            }
-
-            if ($field->getAttribute('suffix_icon')) {
-                $control->suffixIcon($field->getAttribute('suffix_icon'))->inlineSuffix($field->getAttribute('inline_suffix'));
-            }
-        }
-        $rules = $this->makeRules($field);
-        if (count($rules)) {
-            $control->rules($rules);
-        }
-
-        return $control;
-    }
-
-    /**
-     * @deprecated
-     * TODO: Replace input field with component
-     */
-    public function makeRules(VisualFormField $field): array
-    {
-        if (! ($field->getAttribute('validation_rules') && count($field->getAttribute('validation_rules')))) {
-            return [];
-        }
-        $rules = collect($field->getAttribute('validation_rules'));
-
-        return $rules->mapWithKeys(fn (
-            $rule
-        ) => [$rule['rule'] => $rule['rule'] ? "{$rule['rule']}:{$rule['value']}" : $rule['value']])->values()->toArray();
-    }
-
-    /**
-     * @deprecated
-     * TODO: Replace $field with $component
-     */
-    public function makeOptions(VisualFormField $field): Collection | array | null
-    {
-        if (! ControlTypes::hasOptions($field->getAttribute('control_type'))) {
-            return null;
-        }
-
-        if ($field->getAttribute('options_from_db')) {
-            $table = $field->getAttribute('options_db_table');
-            if (! $table) {
-                return collect();
-            }
-            $query = \DB::table($table);
-            $conditions = $field->getAttribute('options_where_conditions');
-            if ($conditions && count($conditions)) {
-                $i = 0;
-                foreach ($conditions as $condition) {
-                    if ($i === 0) {
-                        $query->where($condition['column'], $condition['operator'], $condition['value']);
-                    } else {
-                        // Check if the condition is an OR condition
-                        if (isset($condition['or']) && $condition['or']) {
-                            $query->orWhere($condition['column'], $condition['operator'], $condition['value']);
-                        } else {
-                            $query->where($condition['column'], $condition['operator'], $condition['value']);
-                        }
-                    }
-                    $i++;
-                }
-            }
-            if ($field->getAttribute('options_order_by')) {
-                $query->orderBy($field->getAttribute('options_order_by'), $field->getAttribute('options_order_direction'));
-            }
-            $records = $query->get();
-
-            return $records
-                ->mapWithKeys(fn ($record) => [
-                    $record->{$field->getAttribute('options_key_attribute')} => $record->{$field->getAttribute('options_value_attribute')},
-                ]);
-        } else {
-            return collect($field->getAttribute('options'))->mapWithKeys(fn ($option) => [$option['value'] => $option['label']]);
-        }
-    }
-
     public function getDatabaseTables()
     {
         $tables = Schema::getTables();
@@ -376,16 +201,11 @@ class VisualForms
         ];
     }
 
-    /**
-     * @deprecated
-     *
-     * @return Models\VisualFormEntry|\Illuminate\Database\Eloquent\Model
-     */
     public function recordSubmission(VisualForm $record, array $data, bool $isProcessed = false)
     {
         return $record->entries()->create([
             'payload' => $data,
-            'ip_address' => request()->getClientIp(),
+            'ip_address' => request()->ip(),
             'is_processed' => $isProcessed,
         ]);
     }
