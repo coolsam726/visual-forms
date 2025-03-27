@@ -20,7 +20,7 @@ $hasHeaderActions = filled($headerActions);
     "
 >
     @if ($hasHeaderActions)
-        <div id="actions-legend" class="bg-white p-2 opacity-100 dark:bg-gray-900 dark:opacity-100">
+        <div id="actions-legend" class="flex items-center justify-start space-x-2 bg-white p-2 opacity-100 dark:bg-gray-900 dark:opacity-100">
             <x-filament::actions
                     :actions="$headerActions"
                     :alignment="\Filament\Support\Enums\Alignment::Start"

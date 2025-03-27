@@ -8,11 +8,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Kalnoy\Nestedset\NodeTrait;
+use Spatie\EloquentSortable\Sortable;
+use Spatie\EloquentSortable\SortableTrait;
 
-class VisualFormComponent extends Model
+class VisualFormComponent extends Model implements Sortable
 {
     use HasUlids;
     use NodeTrait;
+    use SortableTrait;
 
     protected $guarded = ['id', 'ulid'];
 
@@ -30,6 +33,17 @@ class VisualFormComponent extends Model
     public function uniqueIds(): array
     {
         return ['ulid'];
+    }
+
+    public function determineOrderColumnName(): string
+    {
+        return 'sort_order';
+    }
+
+    public function buildSortQuery()
+    {
+        return static::query()->where('is_active','=', true)
+            ->where('parent_id', $this->getAttribute('parent_id'));
     }
 
     public function visualForm(): BelongsTo
@@ -56,5 +70,26 @@ class VisualFormComponent extends Model
         $data['form_id'] = $this->getAttribute('form_id');
 
         return $this->children()->create($data);
+    }
+
+    protected static function booted()
+    {
+//        self::saved(function (VisualFormComponent $model) {
+//            // sort the siblings
+//            if ($model->sort_order < 1) {
+//                $model->setHighestOrderNumber();
+//            }
+//            if ($model->getAttribute('parent_id') !== null) {
+//                // if sort is zero, set the highest order
+//                $ids = $model->siblingsAndSelf()
+//                    ->where('is_active', '=', true)
+//                    ->orderBy('sort_order')
+//                    ->orderBy('created_at')
+//                    ->pluck('id')
+//                    ->values()
+//                    ->toArray();
+//                VisualFormComponent::setNewOrder($ids);
+//            }
+//        });
     }
 }
