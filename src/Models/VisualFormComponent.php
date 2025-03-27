@@ -72,7 +72,5 @@ class VisualFormComponent extends Model implements Sortable
         return $this->children()->create($data);
     }
 
-    protected static function booted()
-    {
-    }
+    protected static function booted() {}
 }

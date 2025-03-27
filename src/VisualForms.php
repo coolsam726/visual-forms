@@ -7,7 +7,6 @@ use Coolsam\VisualForms\Models\VisualForm;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Filament\Forms\Components;
 use File;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
