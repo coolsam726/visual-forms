@@ -2,6 +2,7 @@
 
 namespace Coolsam\VisualForms\Filament\Resources;
 
+use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
@@ -10,9 +11,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -21,7 +20,6 @@ use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
@@ -55,76 +53,44 @@ class VisualFormResource extends Resource
             ->schema([
                 Tabs::make()
                     ->columnSpanFull()
-                    ->schema([
-                        Tabs\Tab::make(__('Basic Details'))->schema([
-                            TextInput::make('name')
-                                ->required()
-                                ->afterStateHydrated(function (VisualForm $record, Get $get, Set $set) {
-                                    if (! $get('settings')) {
-                                        $set('settings', [
-                                            ['name' => 'contact_phone', 'setting_type' => 'text', 'value' => null],
-                                            ['name' => 'contact_email', 'setting_type' => 'email', 'value' => null],
-                                            ['name' => 'privacy_policy_url', 'setting_type' => 'url', 'value' => null],
-                                            ['name' => 'show_media_consent', 'setting_type' => 'boolean', 'value' => null],
-                                            ['name' => 'media_consent_content', 'setting_type' => 'richText', 'value' => null],
-                                        ]);
-                                    }
-                                })
-                                ->live(onBlur: true)
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                    ->schema(function () {
+                        $settingsSchema = VisualForms::callHelper(\config('visual-forms.helpers.form-settings-schema'));
 
-                            TextInput::make('slug')
-                                ->readonly()
-                                ->required()
-                                ->unique(VisualForm::class, 'slug', fn ($record) => $record),
+                        return [
+                            Tabs\Tab::make(__('Basic Details'))->schema([
+                                TextInput::make('name')
+                                    ->required()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
-                            TextInput::make('description'),
-                            Select::make('users')->options(\Config::get('visual-forms.closures.fetchUsers'))->multiple()->required(),
+                                TextInput::make('slug')
+                                    ->readonly()
+                                    ->required()
+                                    ->unique(VisualForm::class, 'slug', fn ($record) => $record),
 
-                            Checkbox::make('is_active')->default(true),
+                                TextInput::make('description'),
+                                Checkbox::make('is_active')->default(true),
 
-                            Placeholder::make('created_at')
-                                ->label('Created Date')
-                                ->content(fn (
-                                    ?VisualForm $record
-                                ): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
+                                Placeholder::make('created_at')
+                                    ->label('Created Date')
+                                    ->content(fn (
+                                        ?VisualForm $record
+                                    ): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
 
-                            Placeholder::make('updated_at')
-                                ->label('Last Modified Date')
-                                ->content(fn (
-                                    ?VisualForm $record
-                                ): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
-                        ])->columns(),
-                        Tabs\Tab::make(__('More Settings'))->lazy()
-                            ->schema([
-                                Repeater::make('settings')
-                                    ->schema(components: [
-                                        TextInput::make('name')->label(__('Setting Name'))
-                                            ->placeholder('e.g email_recipients')->required(),
-                                        Select::make('setting_type')->label(__('Setting Type'))
-                                            ->options([
-                                                'text' => 'Text',
-                                                'integer' => 'Integer',
-                                                'url' => 'URL',
-                                                'float' => 'Decimal',
-                                                'password' => 'Password/Secret',
-                                                'email' => 'Email',
-                                                'longText' => 'Textarea',
-                                                'file' => 'File',
-                                                'date' => 'Date',
-                                                'time' => 'Time',
-                                                'datetime' => 'Date & Time',
-                                                'boolean' => 'Boolean',
-                                                'richText' => 'Rich Text (HTML)',
-                                                'markdown' => 'Markdown',
-                                                'tags' => 'Tags',
-                                            ])->searchable()->default('text')
-                                            ->live()
-                                            ->required(),
-                                        ...static::makeSettingValueField(),
-                                    ])->columns(3),
-                            ]),
-                    ]),
+                                Placeholder::make('updated_at')
+                                    ->label('Last Modified Date')
+                                    ->content(fn (
+                                        ?VisualForm $record
+                                    ): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
+                            ])->columns(),
+                            Tabs\Tab::make(__('More Settings'))
+                                ->columns(['md' => 2, 'lg' => 3])
+                                ->visible(fn () => filled($settingsSchema))
+                                ->statePath('settings')
+                                ->lazy()
+                                ->schema(fn () => VisualForms::callHelper(\Config::get('visual-forms.helpers.form-settings-schema')) ?: []),
+                        ];
+                    }),
             ]);
     }
 

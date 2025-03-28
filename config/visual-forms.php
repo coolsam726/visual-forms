@@ -76,7 +76,8 @@ return [
             },
         ],
     ],
-    'closures' => [
-        //        'fetchUsers' => fn(\Filament\Forms\Get $get) => \App\Models\User::all()->pluck('name', 'id'),
+    'helpers-class' => \Coolsam\VisualForms\Support\FormHelpers::class, // feel free to extend this class and add your own methods
+    'helpers' => [
+        'form-settings-schema' => 'formSettingsSchema', // important to have this method in your helpers class
     ],
 ];

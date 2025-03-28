@@ -209,4 +209,22 @@ class VisualForms
             'is_processed' => $isProcessed,
         ]);
     }
+
+    public function callHelper($method, ...$args): mixed
+    {
+        if (! $method) {
+            return null;
+        }
+
+        $class = \Config::get('visual-forms.helpers-class');
+        if (! $class) {
+            return null;
+        }
+
+        $instance = new $class;
+        if (method_exists($instance, $method)) {
+            return call_user_func([$instance, $method], ...$args);
+        }
+        return null;
+    }
 }
