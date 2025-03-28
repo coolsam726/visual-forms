@@ -25,6 +25,9 @@ class FieldEditor extends Widget implements HasActions, HasForms
 
     protected int | string | array $columnSpan = 'full';
 
+    /**
+     * @phpstan-ignore-next-line
+     */
     protected static string $view = 'visual-forms::filament.resources.visual-form-resource.widgets.field-editor';
 
     public function form(Form $form): Form
