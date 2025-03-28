@@ -15,6 +15,7 @@ class VisualForm extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'settings' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -37,5 +38,11 @@ class VisualForm extends Model
     public function recordSubmission(array $data, bool $isProcessed = false)
     {
         return VisualForms::recordSubmission($this, $data, $isProcessed);
+    }
+
+    public function getSetting(string $key, $default = null)
+    {
+        $settings = $this->getAttribute('settings');
+        return collect($settings)->get($key);
     }
 }
