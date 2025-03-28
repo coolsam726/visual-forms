@@ -9,10 +9,10 @@ class ExtendedFieldset extends Fieldset implements HasHeaderActions
 {
     use \Filament\Forms\Components\Concerns\HasHeaderActions;
 
-    public function getView(): string
-    {
-        return 'visual-forms::livewire.extended-fieldset';
-    }
+    /**
+     * @var view-string
+     */
+    protected string $view = 'visual-forms::livewire.extended-fieldset';
 
     public function getId(): ?string
     {
