@@ -45,7 +45,7 @@ class VisualFormResource extends Resource
     public static function getWidgets(): array
     {
         return [
-            Resources\VisualFormResource\Widgets\FieldEditor::make(),
+            Resources\VisualFormResource\Widgets\FieldEditor::class,
         ];
     }
 
