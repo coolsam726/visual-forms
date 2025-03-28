@@ -60,23 +60,23 @@ class VisualFormResource extends Resource
                             TextInput::make('name')
                                 ->required()
                                 ->afterStateHydrated(function (VisualForm $record, Get $get, Set $set) {
-                                    if(!$get('settings')) {
+                                    if (! $get('settings')) {
                                         $set('settings', [
-                                           ['name' => 'contact_phone', 'setting_type' => 'text', 'value' => null],
+                                            ['name' => 'contact_phone', 'setting_type' => 'text', 'value' => null],
                                             ['name' => 'contact_email', 'setting_type' => 'email', 'value' => null],
                                             ['name' => 'privacy_policy_url', 'setting_type' => 'url', 'value' => null],
-                                            ['name' => 'show_media_consent', 'setting_type' => 'boolean','value' => null],
-                                            ['name' => 'media_consent_content','setting_type' => 'richText', 'value' => null]
+                                            ['name' => 'show_media_consent', 'setting_type' => 'boolean', 'value' => null],
+                                            ['name' => 'media_consent_content', 'setting_type' => 'richText', 'value' => null],
                                         ]);
                                     }
                                 })
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state))),
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                             TextInput::make('slug')
                                 ->readonly()
                                 ->required()
-                                ->unique(VisualForm::class, 'slug', fn($record) => $record),
+                                ->unique(VisualForm::class, 'slug', fn ($record) => $record),
 
                             TextInput::make('description'),
                             Select::make('users')->options(\Config::get('visual-forms.closures.fetchUsers'))->multiple()->required(),
@@ -85,13 +85,13 @@ class VisualFormResource extends Resource
 
                             Placeholder::make('created_at')
                                 ->label('Created Date')
-                                ->content(fn(
+                                ->content(fn (
                                     ?VisualForm $record
                                 ): string => $record?->getAttribute('created_at')?->diffForHumans() ?? '-'),
 
                             Placeholder::make('updated_at')
                                 ->label('Last Modified Date')
-                                ->content(fn(
+                                ->content(fn (
                                     ?VisualForm $record
                                 ): string => $record?->getAttribute('updated_at')?->diffForHumans() ?? '-'),
                         ])->columns(),
@@ -139,12 +139,12 @@ class VisualFormResource extends Resource
                 TextColumn::make('description'),
                 TextColumn::make('is_active')->badge()
                     ->label(__('Active'))
-                    ->color(fn(VisualForm $record) => match ($record->getAttribute('is_active')) {
+                    ->color(fn (VisualForm $record) => match ($record->getAttribute('is_active')) {
                         true => 'success',
                         false => 'danger',
                         default => 'warning',
                     })
-                    ->formatStateUsing(fn($state) => $state ? 'Yes' : 'No'),
+                    ->formatStateUsing(fn ($state) => $state ? 'Yes' : 'No'),
             ])
             ->filters([
                 //
@@ -183,36 +183,49 @@ class VisualFormResource extends Resource
     {
         // Convert this to be an array, each with a closure to visible
         return [
-            TextInput::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            TextInput::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'text'),
-            TextInput::make('value')->label(__('Setting Value'))->required()->numeric()->integer()->visible(fn(Get $get
+            TextInput::make('value')->label(__('Setting Value'))->required()->numeric()->integer()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'integer'),
-            TextInput::make('value')->label(__('Setting Value'))->required()->numeric()->visible(fn(Get $get
+            TextInput::make('value')->label(__('Setting Value'))->required()->numeric()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'float'),
-            TextInput::make('value')->label(__('Setting Value'))->required()->password()->revealable()->visible(fn(
+            TextInput::make('value')->label(__('Setting Value'))->required()->password()->revealable()->visible(fn (
                 Get $get
             ) => $get('setting_type') == 'password'),
-            TextInput::make('value')->label(__('Setting Value'))->required()->email()->visible(fn(Get $get
+            TextInput::make('value')->label(__('Setting Value'))->required()->email()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'email'),
-            Textarea::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            Textarea::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'longText'),
-            FileUpload::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            FileUpload::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'file'),
-            DatePicker::make('value')->label(__('Setting Value'))->required()->date()->visible(fn(Get $get
+            DatePicker::make('value')->label(__('Setting Value'))->required()->date()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'date'),
-            TimePicker::make('value')->label(__('Setting Value'))->required()->time()->visible(fn(Get $get
+            TimePicker::make('value')->label(__('Setting Value'))->required()->time()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'time'),
-            DateTimePicker::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            DateTimePicker::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'datetime'),
-            ToggleButtons::make('value')->boolean()->inline()->label(__('Setting Value'))->default(false)->visible(fn(Get $get
+            ToggleButtons::make('value')->boolean()->inline()->label(__('Setting Value'))->default(false)->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'boolean'),
-            RichEditor::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            RichEditor::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'richText')->columnSpanFull(),
-            MarkdownEditor::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            MarkdownEditor::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'markdown')->columnSpanFull(),
-            TagsInput::make('value')->label(__('Setting Value'))->required()->visible(fn(Get $get
+            TagsInput::make('value')->label(__('Setting Value'))->required()->visible(fn (
+                Get $get
             ) => $get('setting_type') == 'tags')->columnSpanFull(),
-            TextInput::make('one_conf')
+            TextInput::make('one_conf'),
         ];
     }
 }
