@@ -76,4 +76,7 @@ return [
             },
         ],
     ],
+    'closures' => [
+        //        'fetchUsers' => fn(\Filament\Forms\Get $get) => \App\Models\User::all()->pluck('name', 'id'),
+    ],
 ];
