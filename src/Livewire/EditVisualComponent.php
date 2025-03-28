@@ -9,6 +9,9 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Livewire\Component;
 
+/**
+ * @property Form $form
+ */
 class EditVisualComponent extends Component implements HasForms
 {
     use InteractsWithForms;
@@ -20,7 +23,7 @@ class EditVisualComponent extends Component implements HasForms
     public function mount(int $id): void
     {
         $this->record = VisualFormComponent::findOrFail($id);
-        $this->form->fill($this->record->toArray() ?? []);
+        $this->form->fill($this->record->toArray());
     }
 
     public function form(Form $form): Form

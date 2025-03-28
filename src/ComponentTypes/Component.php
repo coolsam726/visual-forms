@@ -623,7 +623,7 @@ abstract class Component
                     $sortAction,
                 ];
             }
-            if (method_exists($component, 'hintAction')) {
+            if (method_exists($component, 'hintActions')) {
                 $component->hintActions($actions);
             } elseif (method_exists($component, 'headerActions')) {
                 $component->headerActions($actions);

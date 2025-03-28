@@ -27,7 +27,7 @@ class CheckboxList extends Component
     public function makeComponent(bool $editable = false)
     {
         $record = $this->getRecord();
-        if (! $record) {
+        if (!$record) {
             throw new \Exception('Record not found');
         }
 
@@ -86,7 +86,9 @@ class CheckboxList extends Component
         if (method_exists($component, 'boolean') && Utils::getBool($props->get('boolean'))) {
             $component->boolean();
             if ($props->get('default') !== null) {
-                $component->default(Utils::getBool($props->get('default')));
+                if (method_exists($component, 'default')) {
+                    $component->default(Utils::getBool($props->get('default')));
+                }
             }
         }
 
@@ -110,7 +112,7 @@ class CheckboxList extends Component
     {
         return $this->extendCommonSchema(
             [
-                \Filament\Forms\Components\Fieldset::make(__($this->getOptionName() . ' Properties'))
+                \Filament\Forms\Components\Fieldset::make(__($this->getOptionName().' Properties'))
                     ->statePath('props')->schema(
                         $this->getMainSchemaFields()
                     ),

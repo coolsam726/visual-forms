@@ -26,7 +26,7 @@ class EntriesRelationManager extends RelationManager
         return $form
             ->statePath('payload')
             ->schema(fn (
-                VisualFormEntry $record
+                ?VisualFormEntry $record
             ) => $record?->getAttribute('id') ? $record->getAttribute('parent')->schema() : []);
     }
 
