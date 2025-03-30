@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - '**.php'
+    branches-ignore:
+      - main
+      - staging
 
 permissions:
   contents: write
