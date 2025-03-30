@@ -20,7 +20,7 @@ class VisualForms
 
         return collect($files)
             ->map(fn (SplFileInfo $file) => Utils::getFileNamespace($file, 'Coolsam\VisualForms\ComponentTypes'))
-            ->filter(fn ($class): bool => is_subclass_of($class, Component::class))
+            ->filter(fn ($class): bool => is_subclass_of($class, Component::class) && ! (new \ReflectionClass($class))->isAbstract())
             ->mapWithKeys(fn (string $class) => [
                 $class => class_exists($class) ? (new $class)->getOptionName() : str($class)->afterLast('\\')->camel()->snake()->title()->explode('_')->join(' '),
             ]);
@@ -225,6 +225,7 @@ class VisualForms
         if (method_exists($instance, $method)) {
             return call_user_func([$instance, $method], ...$args);
         }
+
         return null;
     }
 }

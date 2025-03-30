@@ -2,24 +2,19 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class ToggleButtons extends Radio
+use Coolsam\VisualForms\Concerns\HasOptions;
+use Filament\Forms;
+
+class ToggleButtons extends Field
 {
+    use HasOptions;
     public function getOptionName(): string
     {
         return __('Toggle Buttons');
     }
 
-    public function makeComponent(bool $editable = false)
+    public function letThereBe(string $name): Forms\Components\ToggleButtons
     {
-        $record = $this->getRecord();
-        if (! $record) {
-            throw new \Exception('Record not found');
-        }
-        $component = \Filament\Forms\Components\ToggleButtons::make($record->getAttribute('name'));
-        $this->configureComponent($component);
-
-        $this->makeEditableAction($component, $editable);
-
-        return $component;
+        return Forms\Components\ToggleButtons::make($name);
     }
 }

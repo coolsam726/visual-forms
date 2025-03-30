@@ -4,92 +4,94 @@ namespace Coolsam\VisualForms\Concerns;
 
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
-use Coolsam\VisualForms\ComponentTypes\CheckboxList;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Utils;
 use Filament\Forms;
 use Illuminate\Support\Collection;
 
 /**
- * @mixin CheckboxList
+ * @mixin Forms\Components\Field
  */
 trait HasOptions
 {
     public function extendOptionsSchema(array $schema = []): array
     {
         return [
-            Forms\Components\Fieldset::make(__('Options Configuration'))->statePath('props')->schema([
-                Forms\Components\ToggleButtons::make('optionsSource')->options([
-                    'static' => __('Static (Define manually)'),
-                    'database' => __('Database'),
-                    'jsonApi' => __('Json API'),
-                ])->live()->inline()->columnSpanFull(),
-                TableRepeater::make('options')->headers([
-                    Header::make(__('Value')),
-                    Header::make(__('Label')),
-                    Header::make('Should Specify?'),
-                ])->schema([
-                    Forms\Components\TextInput::make('value')->required()->autofocus(),
-                    Forms\Components\TextInput::make('label'),
-                    Forms\Components\ToggleButtons::make('should_specify')->boolean()->inline()->default(false),
-                ])
-                    ->columnSpanFull()
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'static')
-                    ->disabled(fn (Forms\Get $get) => ($get('optionsSource') !== 'static'))
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'static'),
-                Forms\Components\Select::make('optionsTable')
-                    ->options(fn () => VisualForms::getDatabaseTables())
-                    ->live()
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database')
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database'),
-                Forms\Components\Select::make('optionsLabelField')->label(__('Label Field'))
-                    ->options(fn (Forms\Get $get) => VisualForms::getDatabaseColumns($get('optionsTable')))
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable'))
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable')),
-                Forms\Components\Select::make('optionsValueField')->label(__('Value Field'))
-                    ->options(fn (Forms\Get $get) => VisualForms::getDatabaseColumns($get('optionsTable')))
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable'))
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable')),
-                TableRepeater::make('optionsConditions')
-                    ->columnSpanFull()
-                    ->defaultItems(0)
-                    ->visible(fn (Forms\Get $get) => $get('optionsSource') === 'database' && $get('optionsTable'))
-                    ->headers([
-                        Header::make('or')->label(__('OR?')),
-                        Header::make('column'),
-                        Header::make('operator'),
-                        Header::make('value'),
+            Forms\Components\Fieldset::make(__('Options Configuration'))
+                ->statePath('props')->schema([
+                    Forms\Components\ToggleButtons::make('optionsSource')
+                        ->required()
+                        ->options([
+                            'static' => __('Static (Define manually)'),
+                            'database' => __('Database'),
+                            'jsonApi' => __('Json API'),
+                        ])->live()->inline()->columnSpanFull(),
+                    TableRepeater::make('options')->headers([
+                        Header::make(__('Value')),
+                        Header::make(__('Label')),
+                        Header::make('Should Specify?'),
+                    ])->schema([
+                        Forms\Components\TextInput::make('value')->required()->autofocus(),
+                        Forms\Components\TextInput::make('label'),
+                        Forms\Components\ToggleButtons::make('should_specify')->boolean()->inline()->default(false),
                     ])
-                    ->schema([
-                        Forms\Components\Checkbox::make('or')->default(false),
-                        Forms\Components\Select::make('column')
-                            ->required()
-                            ->options(fn (
-                                Forms\Get $get
-                            ) => VisualForms::getDatabaseColumns($get('../../optionsTable'))),
-                        Forms\Components\Select::make('operator')
-                            ->searchable()
-                            ->required()
-                            ->options(fn () => VisualForms::getDbOperators()),
-                        Forms\Components\TextInput::make('value')->required(),
-                    ]),
-                Forms\Components\TextInput::make('optionsJsonUrl')->label(__('JSON URL'))
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
-                Forms\Components\TextInput::make('optionsLabelField')->label(__('Label Field'))
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
-                Forms\Components\TextInput::make('optionsValueField')->label(__('Value Field'))
-                    ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
-                    ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
-                    ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
-                ...$schema,
-            ]),
+                        ->columnSpanFull()
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'static')
+                        ->disabled(fn (Forms\Get $get) => ($get('optionsSource') !== 'static'))
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'static'),
+                    Forms\Components\Select::make('optionsTable')
+                        ->options(fn () => VisualForms::getDatabaseTables())
+                        ->live()
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database')
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database'),
+                    Forms\Components\Select::make('optionsLabelField')->label(__('Label Field'))
+                        ->options(fn (Forms\Get $get) => VisualForms::getDatabaseColumns($get('optionsTable')))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable'))
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable')),
+                    Forms\Components\Select::make('optionsValueField')->label(__('Value Field'))
+                        ->options(fn (Forms\Get $get) => VisualForms::getDatabaseColumns($get('optionsTable')))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'database')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable'))
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'database' || ! $get('optionsTable')),
+                    TableRepeater::make('optionsConditions')
+                        ->columnSpanFull()
+                        ->defaultItems(0)
+                        ->visible(fn (Forms\Get $get) => $get('optionsSource') === 'database' && $get('optionsTable'))
+                        ->headers([
+                            Header::make('or')->label(__('OR?')),
+                            Header::make('column'),
+                            Header::make('operator'),
+                            Header::make('value'),
+                        ])
+                        ->schema([
+                            Forms\Components\Checkbox::make('or')->default(false),
+                            Forms\Components\Select::make('column')
+                                ->required()
+                                ->options(fn (
+                                    Forms\Get $get
+                                ) => VisualForms::getDatabaseColumns($get('../../optionsTable'))),
+                            Forms\Components\Select::make('operator')
+                                ->searchable()
+                                ->required()
+                                ->options(fn () => VisualForms::getDbOperators()),
+                            Forms\Components\TextInput::make('value')->required(),
+                        ]),
+                    Forms\Components\TextInput::make('optionsJsonUrl')->label(__('JSON URL'))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
+                    Forms\Components\TextInput::make('optionsLabelField')->label(__('Label Field'))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
+                    Forms\Components\TextInput::make('optionsValueField')->label(__('Value Field'))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'jsonApi')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi')
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'jsonApi'),
+                    ...$schema,
+                ]),
         ];
     }
 
@@ -160,5 +162,11 @@ trait HasOptions
     public function makeOptions(&$component): void
     {
         $component->options(fn () => $this->getOptions());
+    }
+
+    public function configureComponent(&$component, bool $editable): void
+    {
+        parent::configureComponent($component, $editable);
+        $this->makeOptions($component);
     }
 }
