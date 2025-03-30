@@ -2,36 +2,19 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class Radio extends CheckboxList
+use Coolsam\VisualForms\Concerns\HasOptions;
+
+class Radio extends Field
 {
+    use HasOptions;
+
     public function getOptionName(): string
     {
         return __('Radio');
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function makeComponent(bool $editable = false)
+    public function letThereBe(string $name): \Filament\Forms\Components\Radio
     {
-        if (! $record = $this->getRecord()) {
-            throw new \Exception('Record not found');
-        }
-
-        $component = \Filament\Forms\Components\Radio::make($record->getAttribute('name'));
-
-        $this->configureComponent($component);
-
-        $this->makeEditableAction($component, $editable);
-
-        return $component;
-    }
-
-    protected function getMainSchemaFields(): array
-    {
-        return [
-            ...parent::getMainSchemaFields(),
-            \Filament\Forms\Components\Checkbox::make('boolean')->inline()->label(__('Boolean'))->default(false),
-        ];
+        return \Filament\Forms\Components\Radio::make($name);
     }
 }

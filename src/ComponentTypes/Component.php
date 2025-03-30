@@ -4,17 +4,21 @@ namespace Coolsam\VisualForms\ComponentTypes;
 
 use Awcodes\TableRepeater\Components\TableRepeater;
 use Awcodes\TableRepeater\Header;
+use Config;
 use Coolsam\VisualForms\Concerns\HasOptions;
 use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource;
 use Coolsam\VisualForms\Models\VisualFormComponent;
 use Coolsam\VisualForms\Utils;
+use Exception;
+use Filament\Forms;
 use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Actions;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
+use Filament\Support\Enums\IconSize;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\Rule;
@@ -42,7 +46,10 @@ abstract class Component
         return $this->record;
     }
 
-    abstract public function makeComponent(bool $editable = false);
+    /**
+     * Creates a new Component without any further arguments.
+     */
+    abstract public function letThereBe(string $name): Forms\Components\Component;
 
     /**
      * You can pass in an array of Tabs or simply an array of Components together with the tab label if you prefer all components to be in a single tab.
@@ -60,14 +67,25 @@ abstract class Component
         }
 
         return [
-            \Filament\Forms\Components\Section::make(__('Common Details'))
-                ->collapsible()
-                ->schema([
+            ...($isFieldsets ? $components : $components),
+        ];
+    }
+
+    public static function getFullSchema(): array
+    {
+        return [
+            Forms\Components\Tabs::make()->schema([
+                Forms\Components\Tabs\Tab::make(__('Component Type'))->schema([
+                    Forms\Components\Select::make('component_type')
+                        ->required()
+                        ->live()
+                        ->searchable()
+                        ->options(VisualForms::getComponentTypeOptions()),
                     \Filament\Forms\Components\TextInput::make('name')->label(__('Name'))
-                        ->hint(__('e.g first_name'))
+                        ->hint(__('e.g star_name'))
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                        ->afterStateUpdated(function ($state, Set $set, Get $get, $record) {
                             $set(
                                 'label',
                                 str($state)->camel()->snake()->title()->replace('_', ' ')->toString()
@@ -76,8 +94,9 @@ abstract class Component
                             if ($class && ! ($class->isLayout())) {
                                 $set('state_path', $get('name'));
                             }
-                            if (! $this->getRecord()) {
+                            if (! $record) {
                                 $set('column_span_full', false);
+                                $set('is_active', true);
                                 $set('column_span', [
                                     ['key' => 'default', 'value' => 1],
                                     ['key' => 'xs', 'value' => 1],
@@ -107,29 +126,88 @@ abstract class Component
                                 ]);
                             }
                         }),
-                    \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
-                        ->required(fn (Get $get) => $get('first_name') !== null)
-                        ->hint(__('e.g First Name')),
-                    \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
-                        ->hint(__('e.g biodata.first_name'))
-                        ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
-                        ->live(onBlur: true),
-                    \Filament\Forms\Components\Textarea::make('description')->columnSpanFull()->label(__('Description'))->default(''),
-                    \Filament\Forms\Components\Checkbox::make('is_active')->default(true),
+                    Forms\Components\Select::make('parent_id')->label(__('Parent Component'))
+                        ->live()
+                        ->searchable()
+                        ->visible(fn ($record, $state) => $record?->getAttribute('id') || $state)
+                        ->options(Utils::getEligibleParentComponents()->toArray()),
+
+                    Forms\Components\Section::make(__('More details (optional)'))
+                        ->collapsed()
+                        ->visible(fn ($record, $state) => $record?->getAttribute('id') || $state)
+                        ->schema([
+                            \Filament\Forms\Components\TextInput::make('label')->label(__('Label'))
+                                ->required(fn (Get $get) => $get('name') !== null)
+                                ->hint(__('e.g Star Name')),
+                            \Filament\Forms\Components\TextInput::make('state_path')->label(__('State Path'))
+                                ->hint(__('e.g biodata.first_name'))
+                                ->helperText(__('For layouts, setting this will nest the data under that key. For inputs, the default statePath is the component\'s name. Leave blank to use the default state path. Use dots to nest data.'))
+                                ->live(onBlur: true),
+                            \Filament\Forms\Components\Textarea::make('description')
+                                ->columnSpanFull()
+                                ->label(__('Description'))->default(''),
+                            \Filament\Forms\Components\ToggleButtons::make('is_active')->boolean()->default(true),
+                        ]),
                 ]),
-            ...($isFieldsets ? $components : [\Filament\Forms\Components\Section::make($fieldsetLabel ?? 'Specific Field Details')->collapsible()->schema($components)]),
+                Forms\Components\Tabs\Tab::make(__('Component Details'))
+                    ->statePath('props')
+                    ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
+                        Utils::instantiateClass($get('component_type'))->getMainSchema()),
+                Forms\Components\Tabs\Tab::make(__('Configure Options'))
+                    ->lazy()
+                    ->visible(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions())
+                    ->schema(fn (Forms\Get $get) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions() ?
+                        Utils::instantiateClass($get('component_type'))->extendOptionsSchema() : []),
+                Forms\Components\Tabs\Tab::make(__('Configure Columns'))
+                    ->lazy()
+                    ->schema(
+                        fn (Forms\Get $get) => ! $get('component_type') ? [] :
+                            Utils::instantiateClass($get('component_type'))->getColumnsSchema()
+                    ),
+                Forms\Components\Tabs\Tab::make(__('Validation Rules'))
+                    ->lazy()
+                    ->schema(fn (Forms\Get $get) => ! $get('component_type') ? [] :
+                        Utils::instantiateClass($get('component_type'))->getValidationSchema())
+                    ->visible(fn (
+                        Forms\Get $get
+                    ) => $get('component_type') && ! Utils::instantiateClass($get('component_type'))->isLayout()),
+            ])
+                ->activeTab(1)
+                ->columnSpanFull(),
         ];
     }
 
-    abstract public function getMainSchema(): array;
+    abstract public function getSpecificBasicSchema(): array;
 
-    abstract public function getValidationSchema(): array;
+    abstract public function getSpecificValidationSchema(): array;
 
-    abstract public function getColumnsSchema(): array;
+    public function getMainSchema(): array
+    {
+        return $this->extendCommonSchema(
+            [
+                ...$this->getSpecificBasicSchema(),
+                ...$this->affixesSchema(),
+            ]
+        );
+    }
+
+    public function getValidationSchema(): array
+    {
+        return $this->extendValidationSchema([
+            \Filament\Forms\Components\Fieldset::make(__($this->getOptionName() . ' Validation'))
+                ->statePath('props')
+                ->schema($this->getSpecificValidationSchema()),
+        ]);
+    }
+
+    public function getColumnsSchema(): array
+    {
+        return $this->extendColumnsSchema();
+    }
 
     /**
-     * @param  \Filament\Forms\Components\Component[]  $schema
-     * @return \Filament\Forms\Components\Component[]
+     * @param  Forms\Components\Component[]  $schema
+     * @return Forms\Components\Component[]
      */
     protected function extendValidationSchema(array $schema = []): array
     {
@@ -349,6 +427,35 @@ abstract class Component
         return $control;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function makeComponent(bool $editable = false): Forms\Components\Component
+    {
+        if (! $record = $this->getRecord()) {
+            throw new Exception('Record not found');
+        }
+
+        if ($this->isLayout()) {
+            $keyAttrib = 'label';
+        } else {
+            $keyAttrib = 'name';
+        }
+        $component = $this->letThereBe($record->getAttribute($keyAttrib));
+
+        $this->configureComponent($component, $editable);
+
+        if ($this->hasChildren()) {
+            if (method_exists($component, 'schema')) {
+                $component->schema($this->makeChildren($editable));
+            } elseif (method_exists($component, 'steps')) {
+                $component->steps($this->makeChildren($editable));
+            }
+        }
+
+        return $component;
+    }
+
     public function makeValidation(&$component): void
     {
         if (! $this->getRecord()) {
@@ -408,7 +515,7 @@ abstract class Component
 
         if ($this->getProps()->get('unique')) {
             $rule = Rule::unique(
-                \Config::get('visual-forms.tables.visual_form_entries'),
+                Config::get('visual-forms.tables.visual_form_entries'),
                 'payload->' . $this->getRecord()->getAttribute('name')
             );
             if ($this->getRecord()->getAttribute('id')) {
@@ -431,32 +538,32 @@ abstract class Component
         }
 
         $props = $this->getProps();
-        if ($props->get('prefixIcon')) {
+        if ($props->get('prefixIcon') && method_exists($component, 'prefixIcon')) {
             $component->prefixIcon($props->get('prefixIcon'));
-            if ($props->get('prefixIconColor')) {
+            if ($props->get('prefixIconColor') && method_exists($component, 'prefixIconColor')) {
                 $component->prefixIconColor($props->get('prefixIconColor'));
             }
         }
-        if ($props->get('prefix')) {
+        if ($props->get('prefix') && method_exists($component, 'prefix')) {
             $component->prefix($props->get('prefix'));
         }
 
-        if ($props->get('suffixIcon')) {
+        if ($props->get('suffixIcon') && method_exists($component, 'suffixIcon')) {
             $component->suffixIcon($props->get('suffixIcon'));
-            if ($props->get('suffixIconColor')) {
+            if ($props->get('suffixIconColor') && method_exists($component, 'suffixIconColor')) {
                 $component->suffixIconColor($props->get('suffixIconColor'));
             }
         }
 
-        if ($props->get('suffix')) {
+        if ($props->get('suffix') && method_exists($component, 'suffix')) {
             $component->suffix($props->get('suffix'));
         }
 
-        if ($props->get('inlineSuffix')) {
+        if (method_exists($component, 'inlineSuffix')) {
             $component->inlineSuffix(Utils::getBool($props->get('inlineSuffix')));
         }
 
-        if ($props->get('inlinePrefix')) {
+        if (method_exists($component, 'inlineSuffixIcon')) {
             $component->inlinePrefix(Utils::getBool($props->get('inlinePrefix')));
         }
 
@@ -473,13 +580,14 @@ abstract class Component
         return [
             \Filament\Forms\Components\Placeholder::make('affixes')->label(new HtmlString("<h3 class='font-black text-md'>" . __('Affixes') . '</h3>'))->columnSpanFull(),
             \Filament\Forms\Components\Fieldset::make(__('Prefix'))
-                ->statePath('props')
                 ->columns([
                     'md' => 2, 'lg' => 3, 'xl' => 4,
                 ])->schema([
                     \Filament\Forms\Components\TextInput::make('prefix')->label(__('Prefix'))->live(onBlur: true),
-                    \Filament\Forms\Components\Select::make('prefixIcon')->label(__('Prefix Icon'))->live(onBlur: true)->options(Utils::getHeroicons())->searchable(),
-                    \Filament\Forms\Components\ToggleButtons::make('inlinePrefix')->boolean()->inline()->label(__('Inline Prefix'))->default(false),
+                    \Filament\Forms\Components\Select::make('prefixIcon')->label(__('Prefix Icon'))
+                        ->live()->options(Utils::getHeroicons())->searchable(),
+                    \Filament\Forms\Components\ToggleButtons::make('inlinePrefix')->boolean()
+                        ->inline()->label(__('Inline Prefix'))->default(false),
                     \Filament\Forms\Components\Select::make('prefixIconColor')->label(__('Prefix Icon Color'))
                         ->live()->visible(fn ($get) => $get('prefixIcon'))->options(Utils::getAppColors())->native(false),
                 ]),
@@ -487,10 +595,10 @@ abstract class Component
             \Filament\Forms\Components\Fieldset::make(__('Suffix'))->columns([
                 'md' => 2, 'lg' => 3, 'xl' => 4,
             ])
-                ->statePath('props')
                 ->schema([
                     \Filament\Forms\Components\TextInput::make('suffix')->label(__('Suffix'))->live(onBlur: true),
-                    \Filament\Forms\Components\Select::make('suffixIcon')->label(__('Suffix Icon'))->live()->options(Utils::getHeroicons())->searchable(),
+                    \Filament\Forms\Components\Select::make('suffixIcon')->label(__('Suffix Icon'))
+                        ->live()->options(Utils::getHeroicons())->searchable(),
                     \Filament\Forms\Components\ToggleButtons::make('inlineSuffix')->boolean()->inline()->label(__('Inline Suffix'))->default(false),
                     \Filament\Forms\Components\Select::make('suffixIconColor')->label(__('Suffix Icon Color'))
                         ->live()->visible(fn ($get) => $get('suffixIcon'))
@@ -510,7 +618,7 @@ abstract class Component
             ->size('xs')
             ->color('success')
             ->extraAttributes(['class' => 'static'])
-            ->authorize('create', \Config::get('visual-forms.models.visual_form_component'))
+            ->authorize('create', Config::get('visual-forms.models.visual_form_component'))
             ->form(fn (Form $form) => $form
                 ->model(VisualFormComponent::class)
                 ->schema(VisualFormComponentResource::getSchema()))
@@ -635,5 +743,117 @@ abstract class Component
                 $component->extraAttributes(['class' => 'border-dashed border-primary border-2 border-gray-300 rounded-md p-2']);
             }
         }
+    }
+
+    public function configureComponent(&$component, bool $editable): void
+    {
+        $record = $this->getRecord();
+        $props = $this->getProps();
+        if (method_exists($component, 'label')) {
+            if (filled($record->getAttribute('label'))) {
+                $component->label($record->getAttribute('label'));
+            }
+        }
+        if (method_exists($component, 'description')) {
+            if (filled($record->getAttribute('description'))) {
+                $component->description($record->getAttribute('description'));
+            }
+
+            if (method_exists($component, 'inlineLabel')) {
+                $component->inlineLabel(Utils::getBool($props->get('inlineLabel')));
+            }
+
+            if (method_exists($component, 'hiddenLabel')) {
+                $component->hiddenLabel(Utils::getBool($props->get('hiddenLabel')));
+            }
+        }
+        if (method_exists($component, 'icon')) {
+            if ($props->get('icon')) {
+                $component->icon($props->get('icon'));
+            }
+            if (method_exists($component, 'iconSize')) {
+                $component->iconSize($props->get('iconSize') ?? IconSize::Medium->value);
+            }
+        }
+
+        if (method_exists($component, 'collapsible')) {
+            $component->collapsible(Utils::getBool($props->get('collapsible')));
+        }
+        if (method_exists($component, 'collapsed')) {
+            $component->collapsed(Utils::getBool($props->get('collapsed')));
+        }
+
+        if (method_exists($component, 'disabled')) {
+            $component->disabled(Utils::getBool($props->get('disabled')));
+        }
+
+        if (method_exists($component, 'readOnly')) {
+            $component->readOnly(Utils::getBool($props->get('readOnly')));
+        }
+
+        if (($placeholder = $props->get('placeholder')) && method_exists($component, 'placeholder')) {
+            $component->placeholder($placeholder);
+        }
+
+        $helper = $props->get('helperText');
+        if ($helper && method_exists($component, 'helperText')) {
+            $component->helperText($helper);
+        }
+
+        if ($props->get('hint') && method_exists($component, 'hint')) {
+            $component->hint($props->get('hint'));
+        }
+
+        if ($props->get('hintIcon') && method_exists($component, 'hintIcon')) {
+            $component->hintIcon($props->get('hintIcon'));
+        }
+
+        $this->makeColumns($component);
+        $this->makeAffixes($component);
+        $this->makeUnique($component);
+        $this->makeStatePath($component);
+
+        if (! $this->isLayout()) {
+            if ($props->get('default') !== null) {
+                $component->default($props->get('default'));
+            }
+
+            if (Utils::getBool($props->get('required'))) {
+                $component->required();
+            }
+
+            if (Utils::getBool($props->get('searchable'))) {
+                // check if component has searchable method
+                if (method_exists($component, 'searchable')) {
+                    $component->searchable();
+                }
+            }
+
+            if (method_exists($component, 'boolean') && Utils::getBool($props->get('boolean'))) {
+                $component->boolean();
+                if ($props->get('default') !== null) {
+                    if (method_exists($component, 'default')) {
+                        $component->default(Utils::getBool($props->get('default')));
+                    }
+                }
+            }
+
+            if (Utils::getBool($props->get('unique'))) {
+                $component->unique();
+            }
+
+            if (Utils::getBool($props->get('inline'))) {
+                if (method_exists($component, 'inline')) {
+                    $component->inline();
+                }
+            }
+            if (Utils::getBool($props->get('inlineLabel'))) {
+                $component->inlineLabel();
+            }
+
+            $this->makeValidation($component);
+        }
+
+        $this->makeEditableAction($component, $editable);
     }
 }

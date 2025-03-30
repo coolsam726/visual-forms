@@ -2,58 +2,18 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\Utils;
-use Exception;
 use Filament\Forms\Get;
-use phpDocumentor\Reflection\Types\Array_;
-use phpDocumentor\Reflection\Types\Boolean;
-use phpDocumentor\Reflection\Types\Integer;
-use phpDocumentor\Reflection\Types\String_;
 
-class TextInput extends Component
+class TextInput extends Field
 {
     public function getOptionName(): string
     {
         return __('Text Input');
     }
 
-    public function isLayout(): bool
+    public function getSpecificValidationSchema(): array
     {
-        return false;
-    }
-
-    public function hasChildren(): bool
-    {
-        return false;
-    }
-
-    /**
-     * The schema that will be rendered when creating the VisualFormComponent of this type.
-     */
-    public function getMainSchema(): array
-    {
-        return $this->extendCommonSchema([
-            \Filament\Forms\Components\Fieldset::make(__('Text Specific Properties'))
-                ->statePath('props')
-                ->schema(fn () => [
-                    \Filament\Forms\Components\TextInput::make('placeholder')->label(__('Placeholder'))->autocapitalize(),
-                    \Filament\Forms\Components\TextInput::make('helper_text')->label(__('Helper Text')),
-                    \Filament\Forms\Components\TextInput::make('hint')->label(__('Hint')),
-                    \Filament\Forms\Components\ToggleButtons::make('autocapitalize')->boolean()->inline()->default(false)->label(__('Autocapitalize')),
-                    \Filament\Forms\Components\ToggleButtons::make('autocomplete')->boolean()->inline()->default(false)->label(__('Autocomplete')),
-                ])->columns(3),
-            ...$this->affixesSchema(),
-        ]);
-    }
-
-    public function getColumnsSchema(): array
-    {
-        return $this->extendColumnsSchema();
-    }
-
-    public function getValidationSchema(): array
-    {
-        return $this->extendValidationSchema([
+        return [
             \Filament\Forms\Components\Fieldset::make(__('Basic Validation'))
                 ->columns([
                     'default' => 3,
@@ -145,202 +105,11 @@ class TextInput extends Component
                         ->live()
                         ->hidden(fn (Get $get) => ! $get('numeric')),
                 ]),
-        ]);
+        ];
     }
 
-    /**
-     * @throws Exception
-     */
-    public function makeComponent(bool $editable = false): \Filament\Forms\Components\TextInput
+    public function letThereBe(string $name): \Filament\Forms\Components\TextInput
     {
-        /**
-         * 'autocapitalize' => Boolean::class,
-         * 'autocomplete' => Boolean::class,
-         * 'length' => Integer::class,
-         * 'maxLength' => Integer::class,
-         * 'minLength' => Integer::class,
-         * 'readOnly' => Boolean::class,
-         * 'disabled' => Boolean::class,
-         * 'prefix' => String_::class,
-         * 'suffix' => String_::class,
-         * 'prefixIcon' => String_::class,
-         * 'suffixIcon' => String_::class,
-         * 'inlinePrefix' => Boolean::class,
-         * 'inlineSuffix' => Boolean::class,
-         * 'prefixIconColor' => String_::class,
-         * 'suffixIconColor' => String_::class,
-         * 'datalist' => Array_::class,
-         * 'extraInputAttributes' => Array_::class,
-         * 'inputMode' => String_::class,
-         * // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#inputmode
-         * 'placeholder' => String_::class,
-         * 'step' => Integer::class,
-         * 'currentPassword' => Boolean::class,
-         * 'email' => Boolean::class,
-         * 'integer' => Boolean::class,
-         * 'mask' => String_::class,
-         * 'maxValue' => Integer::class,
-         * 'minValue' => Integer::class,
-         * 'numeric' => Boolean::class,
-         * 'password' => Boolean::class,
-         * 'revealable' => Boolean::class,
-         * 'tel' => Boolean::class,
-         * 'telRegex' => String_::class,
-         * 'type' => String_::class,
-         * 'url' => Boolean::class,
-         */
-        $record = $this->getRecord();
-        if (! $record) {
-            throw new Exception('Record is required to make a component');
-        }
-        $control = \Filament\Forms\Components\TextInput::make($record->getAttribute('name'));
-        // Common props
-        if ($label = $record->getAttribute('label')) {
-            $control->label($label);
-        }
-
-        if ($helperText = $record->getAttribute('helper_text')) {
-            $control->helperText($helperText);
-        }
-
-        if ($hint = $record->getAttribute('hint')) {
-            $control->hint($hint);
-        }
-
-        $this->makeColumns($control);
-        $this->makeStatePath($control);
-        $this->makeValidation($control);
-        $props = collect($record->getAttribute('props') ?? []);
-        if ($props->isEmpty()) {
-            return $control;
-        }
-
-        if (Utils::getBool($props->get('required'))) {
-            $control->required();
-        }
-
-        if ($props->has('autocapitalize')) {
-            $control->autocapitalize(Utils::getBool($props->get('autocapitalize')));
-        }
-
-        if ($props->has('autocomplete')) {
-            $control->autocomplete(Utils::getBool($props->get('autocomplete')));
-        }
-
-        if ($props->get('maxLength')) {
-            $control->maxLength(intval($props->get('maxLength')));
-        }
-
-        if ($props->get('minLength')) {
-            $control->minLength(intval($props->get('minLength')));
-        }
-
-        if ($props->get('length')) {
-            $control->length(intval($props->get('length')));
-        }
-
-        if ($props->has('readOnly')) {
-            $control->readOnly(Utils::getBool($props->get('readOnly')));
-        }
-
-        $this->makeAffixes($control);
-
-        if ($props->get('datalist')) {
-            $control->datalist(collect($props->get('datalist'))->toArray());
-        }
-
-        if ($props->get('extraInputAttributes')) {
-            $control->extraInputAttributes(collect($props->get('extraInputAttributes'))->toArray());
-        }
-
-        if ($props->get('inputMode')) {
-            $control->inputMode($props->get('inputMode'));
-        }
-
-        if ($props->get('placeholder')) {
-            $control->placeholder($props->get('placeholder'));
-        }
-
-        if ($props->get('step')) {
-            $control->step(intval($props->get('step')));
-        }
-
-        if (Utils::getBool($props->get('currentPassword'))) {
-            $control->currentPassword();
-        }
-
-        if (Utils::getBool($props->get('password'))) {
-            $control->password();
-        }
-
-        if (Utils::getBool($props->get('revealable'))) {
-            $control->revealable();
-        }
-
-        if ($props->has('email') && Utils::getBool($props->get('email'))) {
-            $control->email();
-        } elseif ($props->has('numeric') && Utils::getBool($props->get('numeric'))) {
-            $control->numeric();
-
-            if ($props->get('maxValue')) {
-                $control->maxValue(intval($props->get('maxValue')));
-            }
-
-            if ($props->get('minValue')) {
-                $control->minValue(intval($props->get('minValue')));
-            }
-        }
-
-        if ($props->has('integer') && Utils::getBool($props->get('integer'))) {
-            $control->integer();
-        }
-
-        if ($props->get('mask')) {
-            $control->mask($props->get('mask'));
-        }
-
-        if ($props->get('type')) {
-            $control->type($props->get('type'));
-        }
-
-        if (Utils::getBool($props->get('tel'))) {
-            $control->tel();
-        }
-
-        if ($props->get('telRegex')) {
-            $control->telRegex($props->get('telRegex'));
-        }
-
-        if (Utils::getBool($props->get('url'))) {
-            $control->url();
-        }
-
-        if ($props->get('gt')) {
-            $control->gt($props->get('gt'));
-        }
-
-        if ($props->get('lt')) {
-            $control->lt($props->get('lt'));
-        }
-
-        if ($props->get('gte')) {
-            $control->gte($props->get('gte'));
-        }
-
-        if ($props->get('lte')) {
-            $control->lte($props->get('lte'));
-        }
-
-        if ($props->get('same')) {
-            $control->same($props->get('same'));
-        }
-
-        if ($props->get('unique')) {
-            $this->makeUnique($control);
-        }
-
-        $this->makeEditableAction($control, $editable);
-
-        return $control;
+        return \Filament\Forms\Components\TextInput::make($name);
     }
 }

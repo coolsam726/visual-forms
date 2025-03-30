@@ -35,6 +35,7 @@ class FieldEditor extends Widget implements HasActions, HasForms
         return $form
             ->model($this->record)
             ->statePath('data')
+            ->columns()
             ->schema(fn (VisualForm $record) => [
                 Actions::make([
                     Actions\Action::make('create_child')->label(__('Add Top-Level Component'))
@@ -48,7 +49,7 @@ class FieldEditor extends Widget implements HasActions, HasForms
                             // Create visual form
                             return $this->record->children()->create($data);
                         }),
-                ]),
+                ])->columnSpanFull(),
                 ...$record->schema(editable: true),
             ]);
     }
