@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\Utils;
 use Filament\Forms;
 
 class Checkbox extends Field

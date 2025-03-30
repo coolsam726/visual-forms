@@ -7,6 +7,7 @@ use Coolsam\VisualForms\Concerns\HasOptions;
 class Radio extends Field
 {
     use HasOptions;
+
     public function getOptionName(): string
     {
         return __('Radio');

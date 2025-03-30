@@ -8,6 +8,7 @@ use Filament\Forms;
 class ToggleButtons extends Field
 {
     use HasOptions;
+
     public function getOptionName(): string
     {
         return __('Toggle Buttons');

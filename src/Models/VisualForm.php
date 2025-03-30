@@ -43,6 +43,7 @@ class VisualForm extends Model
     public function getSetting(string $key, $default = null)
     {
         $settings = $this->getAttribute('settings');
+
         return collect($settings)->get($key);
     }
 }

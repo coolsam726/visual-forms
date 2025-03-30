@@ -3,12 +3,9 @@
 namespace Coolsam\VisualForms\Filament\Resources;
 
 use Coolsam\VisualForms\ComponentTypes\Component;
-use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource\Pages;
 use Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers\ComponentsRelationManager;
 use Coolsam\VisualForms\Models\VisualFormComponent;
-use Coolsam\VisualForms\Utils;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;

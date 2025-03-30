@@ -2,13 +2,7 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\Utils;
-use Exception;
 use Filament\Forms\Get;
-use phpDocumentor\Reflection\Types\Array_;
-use phpDocumentor\Reflection\Types\Boolean;
-use phpDocumentor\Reflection\Types\Integer;
-use phpDocumentor\Reflection\Types\String_;
 
 class TextInput extends Field
 {

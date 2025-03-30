@@ -3,7 +3,6 @@
 namespace Coolsam\VisualForms\ComponentTypes;
 
 use Coolsam\VisualForms\Concerns\HasOptions;
-use Coolsam\VisualForms\Utils;
 
 class CheckboxList extends Field
 {

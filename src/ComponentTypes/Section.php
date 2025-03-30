@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Coolsam\VisualForms\Utils;
 use Filament\Forms;
 use Filament\Forms\Get;
 use Filament\Support\Enums\IconSize;
