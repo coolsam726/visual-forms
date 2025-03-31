@@ -14,13 +14,6 @@ abstract class Layout extends Component
         return true;
     }
 
-    public function getSpecificBasicSchema(): array
-    {
-        return [
-            \Filament\Forms\Components\Textarea::make('description')->label(__('Description')),
-        ];
-    }
-
     public function getSpecificValidationSchema(): array
     {
         return [];
