@@ -2,8 +2,6 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-use Filament\Forms\Get;
-
 class TextInput extends Field
 {
     public function getOptionName(): string

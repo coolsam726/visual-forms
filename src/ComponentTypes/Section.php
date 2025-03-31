@@ -3,8 +3,6 @@
 namespace Coolsam\VisualForms\ComponentTypes;
 
 use Filament\Forms;
-use Filament\Forms\Get;
-use Filament\Support\Enums\IconSize;
 
 class Section extends Layout
 {

@@ -14,4 +14,3 @@ class DateTimePicker extends Field
         return \Filament\Forms\Components\DateTimePicker::make($name);
     }
 }
-{}
