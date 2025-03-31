@@ -164,7 +164,7 @@ abstract class Component
                     ->visible(fn (Forms\Get $get, $record) => $record?->getKey()
                         && $get('component_type')
                         && $get('name')
-                        && $get && Utils::instantiateClass($get('component_type'))->hasOptions())
+                        && Utils::instantiateClass($get('component_type'))->hasOptions())
                     ->schema(fn (
                         Forms\Get $get
                     ) => $get('component_type') && Utils::instantiateClass($get('component_type'))->hasOptions() ?
@@ -634,7 +634,7 @@ abstract class Component
         $this->makeUnique($component);
         $rules = $this->makeRules();
 
-        $props = $this->getProps() ?? collect();
+        $props = $this->getProps();
         if (filled($props)) {
             if (method_exists($component, 'required')) {
                 $component->required(Utils::getBool($props->get('required')));
