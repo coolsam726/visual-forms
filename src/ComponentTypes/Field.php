@@ -43,6 +43,10 @@ abstract class Field extends Component
                     return [
                         \Filament\Forms\Components\Checkbox::make('required')->live()->default(true)->visible(fn (
                         ) => method_exists($component, 'required')),
+                        \Filament\Forms\Components\Checkbox::make('accepted')->label(__('Accepted'))
+                            ->live()->default(false)->visible(fn (Get $get) => !$get('declined') && method_exists($component, 'accepted')),
+                        \Filament\Forms\Components\Checkbox::make('declined')->label(__('Declined'))->live()->default(false)->visible(fn (Get $get
+                        ) => !$get('accepted') && method_exists($component, 'declined')),
                         \Filament\Forms\Components\Checkbox::make('unique')->live()->default(false)->visible(fn (
                         ) => method_exists($component, 'unique')),
                         \Filament\Forms\Components\Checkbox::make('readOnly')->label(__('Read Only'))->live()->default(false)->visible(fn (
