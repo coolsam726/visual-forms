@@ -11,7 +11,7 @@ class Checkbox extends Field
         return __('Checkbox');
     }
 
-    public function letThereBe(string $name): Forms\Components\Checkbox
+    public function letThereBe(string $name): Forms\Components\Checkbox | Forms\Components\Component
     {
         return Forms\Components\Checkbox::make($name);
     }

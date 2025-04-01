@@ -644,7 +644,12 @@ abstract class Component
             if (method_exists($component, 'required')) {
                 $component->required(Utils::getBool($props->get('required')));
             }
-
+            if (method_exists($component, 'accepted')) {
+                $component->accepted(Utils::getBool($props->get('accepted')));
+            }
+            if (method_exists($component, 'declined')) {
+                $component->declined(Utils::getBool($props->get('declined')));
+            }
             if (method_exists($component, 'disabled')) {
                 $component->disabled(Utils::getBool($props->get('disabled')));
             }
