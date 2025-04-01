@@ -2,7 +2,8 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class Hidden extends  Field {
+class Hidden extends Field
+{
     public function getOptionName(): string
     {
         return __('Hidden');
