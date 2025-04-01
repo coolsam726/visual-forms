@@ -2,7 +2,8 @@
 
 namespace Coolsam\VisualForms\ComponentTypes;
 
-class MarkdownEditor extends RichEditor {
+class MarkdownEditor extends RichEditor
+{
     public function getOptionName(): string
     {
         return __('Markdown Editor');
@@ -29,6 +30,6 @@ class MarkdownEditor extends RichEditor {
             'strike',
             'table',
             'undo',
-        ])->mapWithKeys(fn($item) => [$item => str($item)->pascal()->snake()->title()->replace('_', ' ')])->toArray();
+        ])->mapWithKeys(fn ($item) => [$item => str($item)->pascal()->snake()->title()->replace('_', ' ')])->toArray();
     }
 }
