@@ -12,7 +12,7 @@ class RichEditor extends Field
         return __('Rich Editor');
     }
 
-    public function letThereBe(string $name): Forms\Components\Component
+    public function letThereBe(string $name): Forms\Components\RichEditor | Forms\Components\Component
     {
         return Forms\Components\RichEditor::make($name)->default('');
     }
@@ -50,28 +50,26 @@ class RichEditor extends Field
                     ->label(__('Disable Grammarly'))
                     ->helperText(__('Disable Grammarly for this field.'))
                     ->boolean()
-                    ->inline(),
+                    ->inline()
+                    ->visible(function ($get) {
+                        if (! $get('../component_type')) {
+                            return false;
+                        }
+                        if (! $get('../name')) {
+                            return false;
+                        }
+                        $component = (Utils::instantiateClass($get('../component_type')))?->letThereBe($get('../name'));
+                        if (! $component) {
+                            return false;
+                        }
+
+                        return method_exists($component, 'disableGrammarly');
+                    }),
                 Forms\Components\CheckboxList::make('toolbarButtons')
                     ->label(__('Toolbar Buttons'))
                     ->columnSpanFull()
                     ->visible(fn ($get) => ! $get('disableAllToolbarButtons'))
-                    ->options([
-                        'attachFiles' => __('Attach Files'),
-                        'blockquote' => __('Blockquote'),
-                        'bold' => __('Bold'),
-                        'bulletList' => __('Bullet List'),
-                        'codeBlock' => __('Code Block'),
-                        'h1' => __('H1'),
-                        'h2' => __('H2'),
-                        'h3' => __('H3'),
-                        'italic' => __('Italic'),
-                        'link' => __('Link'),
-                        'orderedList' => __('Ordered List'),
-                        'redo' => __('Redo'),
-                        'strike' => __('Strike'),
-                        'underline' => __('Underline'),
-                        'undo' => __('Undo'),
-                    ])
+                    ->options($this->getToolbarButtons())
                     ->columns(['sm' => 2, 'md' => 4, 'lg' => 5]),
             ]),
         ];
@@ -106,5 +104,26 @@ class RichEditor extends Field
         if (filled($props->get('disableGrammarly')) && method_exists($component, 'disableGrammarly')) {
             $component->disableGrammarly(Utils::getBool($props->get('disableGrammarly')));
         }
+    }
+
+    protected function getToolbarButtons(): array
+    {
+        return [
+            'attachFiles' => __('Attach Files'),
+            'blockquote' => __('Blockquote'),
+            'bold' => __('Bold'),
+            'bulletList' => __('Bullet List'),
+            'codeBlock' => __('Code Block'),
+            'h1' => __('H1'),
+            'h2' => __('H2'),
+            'h3' => __('H3'),
+            'italic' => __('Italic'),
+            'link' => __('Link'),
+            'orderedList' => __('Ordered List'),
+            'redo' => __('Redo'),
+            'strike' => __('Strike'),
+            'underline' => __('Underline'),
+            'undo' => __('Undo'),
+        ];
     }
 }
