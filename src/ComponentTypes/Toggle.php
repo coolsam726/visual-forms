@@ -53,14 +53,7 @@ class Toggle extends Checkbox
 
     protected function getColors(): Collection
     {
-        return collect([
-            'primary',
-            'info',
-            'success',
-            'danger',
-            'warning',
-            'gray',
-        ]);
+        return collect(Utils::getAppColors())->keys();
     }
 
     public function configureComponent(&$component, bool $editable): void
