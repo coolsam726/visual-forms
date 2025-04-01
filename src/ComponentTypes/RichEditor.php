@@ -72,7 +72,7 @@ class RichEditor extends Field
                         'underline' => __('Underline'),
                         'undo' => __('Undo'),
                     ])
-                    ->columns(['sm' => 2, 'md' => 4, 'lg' => 5,]),
+                    ->columns(['sm' => 2, 'md' => 4, 'lg' => 5]),
             ]),
         ];
     }
