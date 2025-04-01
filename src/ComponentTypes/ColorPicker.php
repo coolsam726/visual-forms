@@ -11,7 +11,7 @@ class ColorPicker extends Field
         return __('Color Picker');
     }
 
-    public function letThereBe(string $name): Forms\Components\Component|Forms\Components\ColorPicker
+    public function letThereBe(string $name): Forms\Components\Component | Forms\Components\ColorPicker
     {
         return Forms\Components\ColorPicker::make($name);
     }
@@ -45,6 +45,7 @@ class ColorPicker extends Field
                             ->rgb()
                             ->regex('/^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/');
                     }
+
                     break;
                 case 'hsl':
                     if (method_exists($component, 'hsl')) {
@@ -52,6 +53,7 @@ class ColorPicker extends Field
                             ->hsl()
                             ->regex('/^hsl\(\s*(\d+)\s*,\s*(\d*(?:\.\d+)?%)\s*,\s*(\d*(?:\.\d+)?%)\)$/');
                     }
+
                     break;
                 case 'rgba':
                     if (method_exists($component, 'rgba')) {
@@ -59,6 +61,7 @@ class ColorPicker extends Field
                             ->rgba()
                             ->regex('/^rgba\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d*(?:\.\d+)?)\)$/');
                     }
+
                     break;
                 default:
                     if (method_exists($component, 'hex')) {
@@ -66,6 +69,7 @@ class ColorPicker extends Field
                             ->hex()
                             ->regex('/^#([a-f0-9]{6}|[a-f0-9]{3})\b$/');
                     }
+
                     break;
             }
         }
