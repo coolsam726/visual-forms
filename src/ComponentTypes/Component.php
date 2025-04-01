@@ -321,6 +321,11 @@ abstract class Component
                             ->helperText(__('Datalist to be used for the input'))
                             ->placeholder(__('press enter to insert a new tag after typing'))
                             ->columnSpanFull(),
+                        Forms\Components\ToggleButtons::make('multiple')->boolean()->inline()
+                            ->label(__('Multiple'))
+                            ->live()
+                            ->default(false)
+                            ->visible(fn () => method_exists($component, 'multiple')),
                         \Filament\Forms\Components\ToggleButtons::make('disabled')
                             ->boolean()->inline()
                             ->label(__('Disabled'))->default(false)->visible(fn (
@@ -1162,6 +1167,10 @@ abstract class Component
             }
             if (Utils::getBool($props->get('inlineLabel'))) {
                 $component->inlineLabel();
+            }
+
+            if (filled($props->get('multiple')) && method_exists($component, 'multiple')) {
+                $component->multiple(Utils::getBool($props->get('multiple')));
             }
 
             $this->makeValidation($component);
