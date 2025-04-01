@@ -12,7 +12,7 @@ class RichEditor extends Field
         return __('Rich Editor');
     }
 
-    public function letThereBe(string $name): Forms\Components\RichEditor|Forms\Components\Component
+    public function letThereBe(string $name): Forms\Components\RichEditor | Forms\Components\Component
     {
         return Forms\Components\RichEditor::make($name)->default('');
     }
