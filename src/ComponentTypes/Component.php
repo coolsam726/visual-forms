@@ -342,7 +342,7 @@ abstract class Component
                         Forms\Components\ToggleButtons::make('hiddenLabel')->inline()->boolean()->default(false)->label(__('Hidden Label'))
                             ->visible(fn () => method_exists($component, 'hiddenLabel')),
                         Forms\Components\ToggleButtons::make('searchable')->inlineLabel()->boolean()->default(true)
-                            ->label(__('Searchable'))->visible(fn() => method_exists($component, 'searchable')),
+                            ->label(__('Searchable'))->visible(fn () => method_exists($component, 'searchable')),
                         Forms\Components\ToggleButtons::make('native')
                             ->inline()
                             ->default(true)
