@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms\Filament\Resources;
 
-use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
@@ -54,9 +53,6 @@ class VisualFormResource extends Resource
         return \Config::get('visual-forms.resources.visual-form.navigation-icon') ?? parent::getNavigationIcon();
     }
 
-    /**
-     * @return string
-     */
     public static function getNavigationLabel(): string
     {
         return \Config::get('visual-forms.resources.visual-form.navigation-label') ?? parent::getNavigationLabel();
@@ -74,7 +70,7 @@ class VisualFormResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return \Config::get('visual-forms.resources.visual-form.model-label' ) ?? parent::getModelLabel();
+        return \Config::get('visual-forms.resources.visual-form.model-label') ?? parent::getModelLabel();
     }
 
     public static function getCluster(): ?string

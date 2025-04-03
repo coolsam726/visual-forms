@@ -30,9 +30,6 @@ class VisualFormEntryResource extends Resource
         return \Config::get('visual-forms.resources.visual-form-entry.navigation-icon') ?? parent::getNavigationIcon();
     }
 
-    /**
-     * @return string
-     */
     public static function getNavigationLabel(): string
     {
         return \Config::get('visual-forms.resources.visual-form-entry.navigation-label') ?? parent::getNavigationLabel();
@@ -50,7 +47,7 @@ class VisualFormEntryResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return \Config::get('visual-forms.resources.visual-form-entry.model-label' ) ?? parent::getModelLabel();
+        return \Config::get('visual-forms.resources.visual-form-entry.model-label') ?? parent::getModelLabel();
     }
 
     public static function getCluster(): ?string

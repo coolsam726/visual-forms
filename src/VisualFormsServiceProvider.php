@@ -170,11 +170,11 @@ class VisualFormsServiceProvider extends PackageServiceProvider
 
         // register policies
         foreach ($policies as $model => $policy) {
-            if ( ! $policy) {
+            if (! $policy) {
                 continue;
             }
             $modelClass = config("visual-forms.models.{$model}");
-            if ( ! $modelClass) {
+            if (! $modelClass) {
                 continue;
             }
             \Gate::policy($modelClass, $policy);

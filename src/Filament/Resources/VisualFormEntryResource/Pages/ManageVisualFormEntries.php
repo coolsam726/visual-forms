@@ -8,7 +8,6 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageVisualFormEntries extends ManageRecords
 {
-
     public static function getResource(): string
     {
         return \Config::get('visual-forms.resources.visual-form-entry.resource', VisualFormEntryResource::class);
