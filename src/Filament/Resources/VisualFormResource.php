@@ -2,7 +2,6 @@
 
 namespace Coolsam\VisualForms\Filament\Resources;
 
-use Coolsam\VisualForms\Facades\VisualForms;
 use Coolsam\VisualForms\Filament\Resources;
 use Coolsam\VisualForms\Models\VisualForm;
 use Filament\Forms\Components\Checkbox;
@@ -28,6 +27,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
 class VisualFormResource extends Resource
@@ -48,6 +48,36 @@ class VisualFormResource extends Resource
         ];
     }
 
+    public static function getNavigationIcon(): string | Htmlable | null
+    {
+        return \Config::get('visual-forms.resources.visual-form.navigation-icon') ?? parent::getNavigationIcon();
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form.navigation-label') ?? parent::getNavigationLabel();
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \Config::get('visual-forms.resources.visual-form.navigation-group') ?? parent::getNavigationGroup();
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return \Config::get('visual-forms.resources.visual-form.navigation-sort') ?? parent::getNavigationSort();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form.model-label') ?? parent::getModelLabel();
+    }
+
+    public static function getCluster(): ?string
+    {
+        return \Config::get('visual-forms.resources.visual-form.cluster') ?? parent::getCluster();
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -55,7 +85,7 @@ class VisualFormResource extends Resource
                 Tabs::make()
                     ->columnSpanFull()
                     ->schema(function () {
-                        $settingsSchema = VisualForms::callHelper(\config('visual-forms.helpers.form-settings-schema'));
+                        $settingsSchema = \Config::get('visual-forms.closures.form-settings-schema', []);
 
                         return [
                             Tabs\Tab::make(__('Basic Details'))->schema([
@@ -86,10 +116,9 @@ class VisualFormResource extends Resource
                             ])->columns(),
                             Tabs\Tab::make(__('More Settings'))
                                 ->columns(['md' => 2, 'lg' => 3])
-                                ->visible(fn () => filled($settingsSchema))
                                 ->statePath('settings')
                                 ->lazy()
-                                ->schema(fn () => VisualForms::callHelper(\Config::get('visual-forms.helpers.form-settings-schema')) ?: []),
+                                ->schema($settingsSchema),
                         ];
                     }),
             ]);

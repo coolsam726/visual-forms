@@ -15,7 +15,7 @@ class EditVisualFormComponent extends EditRecord
 {
     public static function getResource(): string
     {
-        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+        return \Config::get('visual-forms.resources.visual-form-component.resource', VisualFormComponentResource::class);
     }
 
     public function getHeading(): string | Htmlable
@@ -37,13 +37,13 @@ class EditVisualFormComponent extends EditRecord
                 ->icon('heroicon-o-arrow-turn-left-up')
                 ->color('success')
                 ->url(fn (VisualFormComponent $record) => (
-                    \Config::get('visual-forms.resources.visual-form', VisualFormResource::class)
+                    \Config::get('visual-forms.resources.visual-form.resource', VisualFormResource::class)
                 )::getUrl('edit', ['record' => $record->getAttribute('form_id')])),
             Action::make('parent')->label(__('Parent Component'))
                 ->visible(fn (VisualFormComponent $record) => $record->getAttribute('parent_id') !== null)
                 ->icon('heroicon-o-arrow-left')
                 ->url(fn (VisualFormComponent $record) => (
-                    \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class)
+                    \Config::get('visual-forms.resources.visual-form-component.resource', VisualFormComponentResource::class)
                 )::getUrl('edit', ['record' => $record->getAttribute('parent_id')])),
             DeleteAction::make(),
         ];

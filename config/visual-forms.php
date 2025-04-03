@@ -13,71 +13,48 @@ return [
         'visual_form_entry' => \Coolsam\VisualForms\Models\VisualFormEntry::class,
     ],
     'resources' => [
-        'visual-form' => \Coolsam\VisualForms\Filament\Resources\VisualFormResource::class,
-        'visual-form-component' => \Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource::class,
+        'visual-form' => [
+            'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormResource::class,
+            'model-label' => 'Forms',
+            'navigation-icon' => 'heroicon-o-window',
+            'navigation-group' => 'Form Designer',
+            'navigation-label' => null,
+            'navigation-sort' => 0,
+            'cluster' => null,
+        ],
+        'visual-form-component' => [
+            'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource::class,
+        ],
+        'visual-form-entry' => [
+            'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormEntryResource::class,
+            'model-label' => 'Submission',
+            'navigation-icon' => 'heroicon-o-numbered-list',
+            'navigation-group' => 'Form Designer',
+            'navigation-label' => null,
+            'navigation-sort' => 1,
+            'cluster' => null,
+        ],
     ],
     'policies' => [
-        'visual-forms' => [
-            'viewAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-            'view' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
-                return true;
-            },
-            'create' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return false;
-            },
-            'update' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
-                return true;
-            },
-            'delete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
-                return true;
-            },
-            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-            'restore' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
-                return true;
-            },
-            'forceDelete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualForm $model) {
-                return true;
-            },
-            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-        ],
-        'visual-form-components' => [
-            'viewAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-            'view' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
-                return true;
-            },
-            'create' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-            'update' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
-                return true;
-            },
-            'delete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
-                return true;
-            },
-            'deleteAny' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-            'restore' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
-                return true;
-            },
-            'forceDelete' => function (\Illuminate\Contracts\Auth\Authenticatable $user, \Coolsam\VisualForms\Models\VisualFormComponent $model) {
-                return true;
-            },
-            'reorder' => function (\Illuminate\Contracts\Auth\Authenticatable $user) {
-                return true;
-            },
-        ],
+        'visual_form' => null, // A policy class or null
+        'visual_form_component' => null, // a policy class or null
+        'visual_form_entry' => null,
     ],
-    'helpers-class' => \Coolsam\VisualForms\Support\FormHelpers::class, // feel free to extend this class and add your own methods
-    'helpers' => [
-        'form-settings-schema' => 'formSettingsSchema', // important to have this method in your helpers class
+    'helpers-class' => \Coolsam\VisualForms\Support\FormHelpers::class,
+    'closures' => [
+        'form-settings-schema' => function () {
+            return [
+                \Filament\Forms\Components\TextInput::make('contact_email')
+                    ->placeholder(__('e.g suf@example.net'))
+                    ->required()
+                    ->prefixIcon('heroicon-o-envelope')
+                    ->inlinePrefix()
+                    ->email(),
+                \Filament\Forms\Components\TextInput::make('contact_phone')->prefixIcon('heroicon-o-phone')
+                    ->inlinePrefix()->required(),
+                \Filament\Forms\Components\TextInput::make('notification_email_subject')->nullable(),
+                \Filament\Forms\Components\MarkdownEditor::make('notification_email_body')->nullable()->columnSpanFull(),
+            ];
+        },
     ],
 ];

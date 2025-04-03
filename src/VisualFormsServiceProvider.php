@@ -72,6 +72,8 @@ class VisualFormsServiceProvider extends PackageServiceProvider
      */
     public function packageBooted(): void
     {
+        // Register policies
+        $this->registerPolicies();
         // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),
@@ -160,5 +162,22 @@ class VisualFormsServiceProvider extends PackageServiceProvider
         return [
             'create_visual_forms_tables',
         ];
+    }
+
+    protected function registerPolicies(): void
+    {
+        $policies = config('visual-forms.policies');
+
+        // register policies
+        foreach ($policies as $model => $policy) {
+            if (! $policy) {
+                continue;
+            }
+            $modelClass = config("visual-forms.models.{$model}");
+            if (! $modelClass) {
+                continue;
+            }
+            \Gate::policy($modelClass, $policy);
+        }
     }
 }

@@ -15,8 +15,12 @@ class VisualFormsPlugin implements Plugin
     public function register(Panel $panel): void
     {
         $panel
-            ->discoverResources(in: __DIR__ . '/Filament/Resources', for: 'Coolsam\\VisualForms\\Filament\\Resources')
-            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages');
+//            ->discoverResources(in: __DIR__ . '/Filament/Resources', for: 'Coolsam\\VisualForms\\Filament\\Resources')
+//            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages')
+            ->resources([
+                \Config::get('visual-forms.resources.visual-form.resource'),
+                \Config::get('visual-forms.resources.visual-form-entry.resource'),
+            ]);
     }
 
     public function boot(Panel $panel): void

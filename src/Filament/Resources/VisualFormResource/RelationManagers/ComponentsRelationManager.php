@@ -19,7 +19,10 @@ class ComponentsRelationManager extends RelationManager
 
     public static function getResource()
     {
-        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+        return \Config::get(
+            'visual-forms.resources.visual-form-component.resource',
+            VisualFormComponentResource::class
+        );
     }
 
     protected function configureCreateAction(Tables\Actions\CreateAction $action): void
@@ -50,7 +53,10 @@ class ComponentsRelationManager extends RelationManager
     public function form(Form $form): Form
     {
         return $form
-            ->schema(VisualFormComponentResource::getSchema());
+            ->schema((\Config::get(
+                'visual-forms.resources.visual-form-component.resource',
+                VisualFormComponentResource::class
+            ))::getSchema());
     }
 
     public function table(Table $table): Table
@@ -69,7 +75,9 @@ class ComponentsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('label')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('component_type')->searchable()->sortable()->formatStateUsing(function (string $state) {
+                Tables\Columns\TextColumn::make('component_type')->searchable()->sortable()->formatStateUsing(function (
+                    string $state
+                ) {
                     return Utils::instantiateClass($state)->getOptionName();
                 }),
                 Tables\Columns\IconColumn::make('is_active')->boolean()->label(__('Active')),
@@ -91,7 +99,10 @@ class ComponentsRelationManager extends RelationManager
                 Tables\Actions\Action::make('manage')->label(__('Manage'))
                     ->icon('heroicon-o-chevron-double-right')
                     ->color('success')
-                    ->url(fn (VisualFormComponent $record) => (static::getResource())::getUrl('edit', ['record' => $record->getKey()])),
+                    ->url(fn (VisualFormComponent $record) => (static::getResource())::getUrl(
+                        'edit',
+                        ['record' => $record->getKey()]
+                    )),
                 Tables\Actions\EditAction::make()->color('warning'),
                 Tables\Actions\DeleteAction::make(),
             ])
