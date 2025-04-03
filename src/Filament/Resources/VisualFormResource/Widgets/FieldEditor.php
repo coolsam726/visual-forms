@@ -41,8 +41,14 @@ class FieldEditor extends Widget implements HasActions, HasForms
                     Actions\Action::make('create_child')->label(__('Add Top-Level Component'))
                         ->color('success')->icon('heroicon-o-plus-circle')
                         ->form(fn (Form $form) => $form
-                            ->model(VisualFormComponent::class)
-                            ->schema(VisualFormComponentResource::getSchema()))
+                            ->model(\Config::get(
+                                'visual-forms.models.visual_form_component',
+                                VisualFormComponent::class
+                            ))
+                            ->schema(fn () => \Config::get(
+                                'visual-forms.resources.visual-form-component.resource',
+                                VisualFormComponentResource::class
+                            )::getSchema()))
                         ->mountUsing(fn (
                             ComponentContainer $form
                         ) => $form->fill(['form_id' => $this->record?->getKey()]))->action(function (array $data) {

@@ -2,6 +2,7 @@
 
 namespace Coolsam\VisualForms\Filament\Resources\VisualFormResource\RelationManagers;
 
+use Coolsam\VisualForms\Filament\Resources\VisualFormEntryResource;
 use Coolsam\VisualForms\Models\VisualFormEntry;
 use Filament\Forms\Form;
 use Filament\Infolists;
@@ -57,13 +58,7 @@ class EntriesRelationManager extends RelationManager
             ->modifyQueryUsing(function ($query) {
                 return $query->orderByDesc('created_at');
             })
-            ->columns([
-                Tables\Columns\TextColumn::make('id'),
-                Tables\Columns\TextColumn::make('ulid')->label(__('Unique ID')),
-                Tables\Columns\TextColumn::make('ip_address')->label(__('IP Address')),
-                Tables\Columns\TextColumn::make('created_at')->label(__('Created At'))->dateTime(),
-                Tables\Columns\TextColumn::make('updated_at')->label(__('Updated At'))->dateTime(),
-            ])
+            ->columns((Config('visual-forms.resources.visual-form-entry.resource', VisualFormEntryResource::class))::getTableSchema())
             ->filters([
                 //
             ])

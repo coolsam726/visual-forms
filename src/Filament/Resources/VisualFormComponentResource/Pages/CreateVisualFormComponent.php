@@ -9,7 +9,7 @@ class CreateVisualFormComponent extends CreateRecord
 {
     public static function getResource(): string
     {
-        return \Config::get('visual-forms.resources.visual-form-component', VisualFormComponentResource::class);
+        return \Config::get('visual-forms.resources.visual-form-component.resource', VisualFormComponentResource::class);
     }
 
     protected function getHeaderActions(): array
