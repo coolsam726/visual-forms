@@ -105,7 +105,7 @@ trait HasOptions
         ];
     }
 
-    public function getOptions(): Collection|\Closure
+    public function getOptions(): Collection | \Closure
     {
         $props = $this->getProps();
 
