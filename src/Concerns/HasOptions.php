@@ -23,6 +23,7 @@ trait HasOptions
                         ->required()
                         ->options([
                             'static' => __('Static (Define manually)'),
+                            'closure' => __('Closure'),
                             'database' => __('Database'),
                             'jsonApi' => __('Json API'),
                         ])->live()->inline()->columnSpanFull(),
@@ -39,6 +40,15 @@ trait HasOptions
                         ->required(fn (Forms\Get $get) => $get('optionsSource') === 'static')
                         ->disabled(fn (Forms\Get $get) => ($get('optionsSource') !== 'static'))
                         ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'static'),
+                    Forms\Components\Select::make('optionsClosure')->label(__('Closure'))
+                        ->helperText(__('Closure to use for the options'))
+                        ->required(fn (Forms\Get $get) => $get('optionsSource') === 'closure')
+                        ->disabled(fn (Forms\Get $get) => $get('optionsSource') !== 'closure')
+                        ->hidden(fn (Forms\Get $get) => $get('optionsSource') !== 'closure')
+                        ->prefixIcon('heroicon-o-variable')
+                        ->inlinePrefix()
+                        ->options(fn () => collect(\Config::get('visual-forms.closures', []))->keys()
+                            ->mapWithKeys(fn ($closure) => [$closure => str($closure)->camel()->toString()])),
                     Forms\Components\Select::make('optionsTable')
                         ->options(fn () => VisualForms::getDatabaseTables())
                         ->live()
@@ -95,7 +105,7 @@ trait HasOptions
         ];
     }
 
-    public function getOptions(): Collection
+    public function getOptions(): Collection | \Closure
     {
         $props = $this->getProps();
 
@@ -154,6 +164,14 @@ trait HasOptions
 
                 return collect();
             }
+        } elseif ($props->get('optionsSource') === 'closure') {
+            $closureName = $props->get('optionsClosure');
+            $closure = \Config::get("visual-forms.closures.$closureName");
+            if (filled($closure) && is_callable($closure)) {
+                return $closure;
+            } else {
+                return collect();
+            }
         } else {
             return collect();
         }
@@ -161,7 +179,7 @@ trait HasOptions
 
     public function makeOptions(&$component): void
     {
-        $component->options(fn () => $this->getOptions());
+        $component->options($this->getOptions());
     }
 
     public function configureComponent(&$component, bool $editable): void
