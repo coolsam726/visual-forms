@@ -26,7 +26,7 @@ return [
             'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource::class,
             'model-label' => 'Form Component',
             'navigation-icon' => 'heroicon-o-window',
-            'navigation-group' => 'Form Component',
+            'navigation-group' => 'Form Designer',
             'navigation-label' => null,
             'navigation-sort' => 1,
             'cluster' => null,
