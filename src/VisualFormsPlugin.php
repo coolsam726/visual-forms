@@ -19,6 +19,7 @@ class VisualFormsPlugin implements Plugin
 //            ->discoverPages(in: __DIR__ . '/Filament/Pages', for: 'Coolsam\\VisualForms\\Filament\\Pages')
             ->resources([
                 \Config::get('visual-forms.resources.visual-form.resource'),
+                \Config::get('visual-forms.resources.visual-form-component.resource'),
                 \Config::get('visual-forms.resources.visual-form-entry.resource'),
             ]);
     }

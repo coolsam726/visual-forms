@@ -14,6 +14,7 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,6 +29,41 @@ class VisualFormComponentResource extends Resource
     public static function getModel(): string
     {
         return \Config::get('visual-forms.models.visual_form_component', VisualFormComponent::class);
+    }
+
+    public static function getNavigationIcon(): string | Htmlable | null
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.navigation-icon') ?? parent::getNavigationIcon();
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.navigation-label') ?? parent::getNavigationLabel();
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.navigation-group') ?? parent::getNavigationGroup();
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.navigation-sort') ?? parent::getNavigationSort();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.model-label') ?? parent::getModelLabel();
+    }
+
+    public static function getCluster(): ?string
+    {
+        return \Config::get('visual-forms.resources.visual-form-component.cluster') ?? parent::getCluster();
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'visualForm.name'];
     }
 
     public static function form(Form $form): Form
@@ -76,11 +112,6 @@ class VisualFormComponentResource extends Resource
     public static function getGlobalSearchEloquentQuery(): Builder
     {
         return parent::getGlobalSearchEloquentQuery()->with(['visualForm']);
-    }
-
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['name', 'visualForm.name'];
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
