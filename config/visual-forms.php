@@ -24,6 +24,12 @@ return [
         ],
         'visual-form-component' => [
             'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormComponentResource::class,
+            'model-label' => 'Form Component',
+            'navigation-icon' => 'heroicon-o-window',
+            'navigation-group' => 'Form Designer',
+            'navigation-label' => null,
+            'navigation-sort' => 1,
+            'cluster' => null,
         ],
         'visual-form-entry' => [
             'resource' => \Coolsam\VisualForms\Filament\Resources\VisualFormEntryResource::class,
@@ -31,7 +37,7 @@ return [
             'navigation-icon' => 'heroicon-o-numbered-list',
             'navigation-group' => 'Form Designer',
             'navigation-label' => null,
-            'navigation-sort' => 1,
+            'navigation-sort' => 2,
             'cluster' => null,
         ],
     ],
